@@ -36,19 +36,16 @@ def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
     )
     G = nx.Graph()
 
-    """ # Add all endpoints as nodes in the graph
+    # Add all endpoints as nodes in the graph
     for vertex in instance.endpoints:
         G.add_node(vertex)
-     """
+    
     
     # Add edges with weights to the graph
     for edge in instance.connections:
         v = edge.endpoint_a
         w = edge.endpoint_b
         weight = edge.distance # dont use the function to get the distance
-        G.add_nodes_from([v, w])    # add nodes here because why not 
-        if edge.distance > instance.min_distance_between_placements:
-            continue
         G.add_edge(v, w, weight=weight)
 
     """ 
@@ -68,11 +65,11 @@ def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
  """
     return G
 
-
-def distance(instance: ProblemInstance, u: str, v: str) -> int:
+# use the graph directly here, not the instance
+def distance(graph: nx.Graph, u: str, v: str) -> int:
     """Calculate the shortest path distance between two endpoints in the network."""
-    graph = build_weighted_graph(instance)
-    return nx.shortest_path_length(graph, u, v, weight="weight")
+    #graph = build_weighted_graph(instance)  # we rebuild the graph for every call of this function
+    return nx.all_pairs_dijkstra_path(graph, u, v, weight="weight")
 
 
 class MaxPlacementsSolver:
@@ -82,6 +79,9 @@ class MaxPlacementsSolver:
 
     def __init__(self, instance: ProblemInstance):
         self.instance = instance
+###
+        self.graph = build_weighted_graph(instance)
+###
         self.model = cp_model.CpModel()
 
         # Create a boolean variable for each approved endpoint
@@ -100,11 +100,14 @@ class MaxPlacementsSolver:
     def _add_distance_constraints(self):
         """Add constraints to ensure selected endpoints are not too close."""
         logging.info("Adding distance constraints")
+
+        paths = dict(nx.all_pairs_dijkstra_path_length(self.graph, weight="weight")) # calculate all distances at once instead of for every iteration
+
         for endpoint1, endpoint2 in itertools.combinations(
             self.instance.approved_endpoints, 2
         ):
             if (
-                distance(self.instance, endpoint1, endpoint2)
+                paths[endpoint1][endpoint2]
                 < self.instance.min_distance_between_placements
             ):
                 self.model.Add(self.vars[endpoint1] + self.vars[endpoint2] <= 1)
@@ -141,7 +144,7 @@ class MaxPlacementsSolver:
 
 if __name__ == "__main__":
     # load instance
-    instance = ProblemInstance.parse_file("instances/instance_100.json")
+    instance = ProblemInstance.parse_file("instances/instance_500.json")
     # solve instance
     solver = MaxPlacementsSolver(instance)
     solution = solver.solve()
