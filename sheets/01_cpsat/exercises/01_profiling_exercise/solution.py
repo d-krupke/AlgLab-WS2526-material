@@ -36,26 +36,36 @@ def build_weighted_graph(instance: ProblemInstance) -> nx.Graph:
     )
     G = nx.Graph()
 
-    # Add all endpoints as nodes in the graph
+    """ # Add all endpoints as nodes in the graph
     for vertex in instance.endpoints:
         G.add_node(vertex)
-
+     """
+    
     # Add edges with weights to the graph
+    for edge in instance.connections:
+        v = edge.endpoint_a
+        w = edge.endpoint_b
+        weight = edge.distance # dont use the function to get the distance
+        G.add_nodes_from([v, w])    # add nodes here because why not 
+        if edge.distance > instance.min_distance_between_placements:
+            continue
+        G.add_edge(v, w, weight=weight)
+
+    """ 
+    #going through all nodes twice doesnt make sense, just go through all edges ^
     for v in instance.endpoints:
+        print(v)
         for w in instance.endpoints:
             if v != w:  # Ensure not to check the same node
                 # Check if there is an edge between v and w
                 if any(
-                    edge.endpoint_a == v and edge.endpoint_b == w
-                    for edge in instance.connections
-                ) or any(
-                    edge.endpoint_a == w and edge.endpoint_b == v
+                    (edge.endpoint_a == v and edge.endpoint_b == w) or (edge.endpoint_a == w and edge.endpoint_b == v)
                     for edge in instance.connections
                 ):
                     # Get the weight of the edge and add it to the graph
                     weight = get_edge_weight(instance, v, w)
                     G.add_edge(v, w, weight=weight)
-
+ """
     return G
 
 
@@ -131,7 +141,7 @@ class MaxPlacementsSolver:
 
 if __name__ == "__main__":
     # load instance
-    instance = ProblemInstance.parse_file("instances/instance_50.json")
+    instance = ProblemInstance.parse_file("instances/instance_100.json")
     # solve instance
     solver = MaxPlacementsSolver(instance)
     solution = solver.solve()
