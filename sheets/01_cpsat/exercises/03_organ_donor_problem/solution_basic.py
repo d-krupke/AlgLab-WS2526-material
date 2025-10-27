@@ -18,7 +18,7 @@ class CrossoverTransplantSolver:
 
         self.graph = self._build_directed_graph(self.database)
 
-        self.cycles = list(nx.simple_cycles(self.graph, 3))
+        self.cycles = list(nx.simple_cycles(self.graph, 4))
 
         #sorted(self.cycles)
         all_recipients = self.database.get_all_recipients()
@@ -34,20 +34,14 @@ class CrossoverTransplantSolver:
         accumulated_overlap_r = [sum(x_i * r_ij for x_i, r_ij in zip(self.x, recipient_node)) for recipient_node in zip(*self.recipients_matrix)]
         accumulated_overlap_d = [sum(x_i * d_ij for x_i, d_ij in zip(self.x, donor_node)) for donor_node in zip(*self.donors_matrix)]
 
-
-
         for i in range(len(accumulated_overlap_r)):
             self.model.add(accumulated_overlap_r[i] <= 1)
 
         for i in range(len(accumulated_overlap_d)):
             self.model.add(accumulated_overlap_d[i] <= 1)
-        """ 
-        for recipient_node in zip(*self.recipients_matrix):
-            self.model.add(sum(x_i * r_ij for x_i, r_ij in zip(self.x, recipient_node)) <= 1)
-        
-        """
+            
         # amount of recipients
-        accumulated_nodes = sum(x_i * len(cycle) for cycle, x_i in zip(self.recipients_matrix, self.x))
+        accumulated_nodes = sum(x_i * len(cycle) for cycle, x_i in zip(self.cycles, self.x))
         self.model.maximize(accumulated_nodes)
 
 
@@ -84,9 +78,9 @@ class CrossoverTransplantSolver:
     def _extract_donations(self):
 
         donations = []
-        for cycle in self.cycles:
-            for i in range(len(cycle)):
-                if self.solver.value(self.x[i]) == 1:
+        for index, cycle in enumerate(self.cycles):
+            if self.solver.value(self.x[index]) == 1:
+                for i in range(len(cycle)):
                     j = i+1
                     if j > len(cycle)-1:
                         j = 0
@@ -113,8 +107,5 @@ class CrossoverTransplantSolver:
 
 
         solution = self._extract_donations()
-
-        for i in solution:
-            print(i.donor)
 
         return Solution(donations=solution)
