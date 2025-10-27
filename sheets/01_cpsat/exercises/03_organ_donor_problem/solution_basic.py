@@ -22,33 +22,54 @@ class CrossoverTransplantSolver:
 
         #sorted(self.cycles)
         all_recipients = self.database.get_all_recipients()
-        self.recipients_matrix = [[1 if (recipient in cycle) else 0 for recipient in all_recipients] for cycle in self.cycles]
-        
+        all_donors = self.database.get_all_donors()
+        self.recipients_matrix = [[1 if recipient in cycle else 0 for recipient in all_recipients] for cycle in self.cycles]
+        self.donors_matrix = [[1 if self._donor_in_cycle(donor, cycle) else 0 for donor in all_donors] for cycle in self.cycles]
+
         #decision variable which cycle should be taken
         self.x = [self.model.new_bool_var(f"x{i}") for i in range(len(self.cycles))]
 
 
         #constraints
-        accumulated_overlap = [sum(x_i * r_ij for x_i, r_ij in zip(self.x, recipient_node)) for recipient_node in zip(*self.recipients_matrix)]
-        
-        for i in range(len(accumulated_overlap)):
-            self.model.add(accumulated_overlap[i] <= 1)
+        accumulated_overlap_r = [sum(x_i * r_ij for x_i, r_ij in zip(self.x, recipient_node)) for recipient_node in zip(*self.recipients_matrix)]
+        accumulated_overlap_d = [sum(x_i * d_ij for x_i, d_ij in zip(self.x, donor_node)) for donor_node in zip(*self.donors_matrix)]
+
+
+
+        for i in range(len(accumulated_overlap_r)):
+            self.model.add(accumulated_overlap_r[i] <= 1)
+
+        for i in range(len(accumulated_overlap_d)):
+            self.model.add(accumulated_overlap_d[i] <= 1)
         """ 
         for recipient_node in zip(*self.recipients_matrix):
             self.model.add(sum(x_i * r_ij for x_i, r_ij in zip(self.x, recipient_node)) <= 1)
         
         """
-        
-        accumulated_nodes = sum(x_i * r_ij for cycle, x_i in zip(self.recipients_matrix, self.x) for r_ij in cycle)
+        # amount of recipients
+        accumulated_nodes = sum(x_i * len(cycle) for cycle, x_i in zip(self.recipients_matrix, self.x))
         self.model.maximize(accumulated_nodes)
 
 
         self.solver = CpSolver()
-        self.solver.parameters.log_search_progress = True
+        self.solver.parameters.log_search_progress = False
+
+    def _donor_in_cycle(self, donor, cycle):
+
+        for i in range(len(cycle)):
+            j = i+1
+            if j > len(cycle)-1:
+                j = 0
+
+            doner = self.graph[cycle[i]][cycle[j]]["donor"]
+            if doner == donor:
+                return True
+        return False
 
 
-    def _build_directed_graph(self, database) -> nx.MultiDiGraph:
-        graph = nx.MultiDiGraph()
+
+    def _build_directed_graph(self, database) -> nx.DiGraph:
+        graph = nx.DiGraph()
         donors = database.get_all_donors()
         for donor in donors:
             partner = database.get_partner_recipient(donor)
@@ -65,17 +86,16 @@ class CrossoverTransplantSolver:
         donations = []
         for cycle in self.cycles:
             for i in range(len(cycle)):
-                if self.solver.value(self.x[i]):
+                if self.solver.value(self.x[i]) == 1:
                     j = i+1
                     if j > len(cycle)-1:
-                        #break ########################################
                         j = 0
 
-                    donor = self.graph[cycle[i], cycle[j]].get("donor", None)
-                    donations += [Donation(donor, cycle[j])]
+                    donor = self.graph[cycle[i]][cycle[j]]["donor"]
+                    donations += [Donation(donor=donor, recipient=cycle[j])]
 
         return donations
-
+                        
 
     def optimize(self, timelimit: float = math.inf) -> Solution:
         """
@@ -90,6 +110,11 @@ class CrossoverTransplantSolver:
         # TODO: Implement me!
 
         status = self.solver.solve(self.model)
+
+
         solution = self._extract_donations()
+
+        for i in solution:
+            print(i.donor)
 
         return Solution(donations=solution)
