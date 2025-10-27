@@ -1,8 +1,8 @@
 import math
 from typing import List
 
-from data_schema import Instance, Item, Solution
 from ortools.sat.python.cp_model import FEASIBLE, OPTIMAL, CpModel, CpSolver
+from data_schema import Instance, Item, Solution
 
 
 class MultiKnapsackSolver:
@@ -18,6 +18,7 @@ class MultiKnapsackSolver:
     - solver (CpSolver): a CpSolver object representing the constraint programming solver.
     """
 
+
     def __init__(self, instance: Instance, activate_toxic: bool = False):
         """
         Initialize the solver with the given Multi-Knapsack instance.
@@ -32,6 +33,31 @@ class MultiKnapsackSolver:
         self.solver = CpSolver()
         self.solver.parameters.log_search_progress = True
         # TODO: Implement me!
+        # make a matrix of decision variables
+        self.x = [[self.model.new_bool_var(f"x_{j}_{i}") for i in range(len(self.items))] for j in range(len(self.capacities))]
+        # j = trucks, i = items
+        accumulated_value = sum(x_j_i * i.value for x_j in self.x for x_j_i, i in zip(x_j, self.items))
+        accumulated_weights = [sum(x_j_i * i.weight for x_j_i, i in zip(x_j, self.items)) for x_j in self.x]
+        accumulated_decisions = [sum(x_j_i for x_j_i in x_i) for x_i in zip(*self.x)] # iterate over columns
+
+        for w in range(len(accumulated_weights)):
+            self.model.add(accumulated_weights[w] <= self.capacities[w])
+        
+        for d in range(len(accumulated_decisions)):
+            self.model.add(accumulated_decisions[d] <= 1)
+
+        if activate_toxic:
+
+            self.toxic_trucks = [self.model.new_bool_var(f"x{j}_toxtruck") for j in range(len(self.capacities))]
+
+            for j, _ in enumerate(self.capacities, 0):
+                for i, item in enumerate(self.items, 0):
+
+                    self.model.add(self.x[j][i] * item.toxic <= self.toxic_trucks[j])
+                    self.model.add(self.toxic_trucks[j] <= item.toxic + ~self.x[j][i])
+
+
+        self.model.maximize(accumulated_value)
 
 
 
@@ -51,4 +77,9 @@ class MultiKnapsackSolver:
         if timelimit < math.inf:
             self.solver.parameters.max_time_in_seconds = timelimit
         # TODO: Implement me!
-        return Solution(trucks=[])  # empty solution
+
+
+        status = self.solver.solve(self.model)
+        arrangement = [[self.items[i] for _, i in zip(truck, range(len(self.items))) if self.solver.Value(self.x[j][i])] for truck, j in zip(self.x, range(len(self.capacities)))]
+
+        return Solution(trucks=arrangement)
