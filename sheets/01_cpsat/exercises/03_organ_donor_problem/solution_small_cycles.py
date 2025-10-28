@@ -22,26 +22,20 @@ class CycleLimitingCrossoverTransplantSolver:
 
         self.cycles = list(nx.simple_cycles(self.graph, 3))
 
-        #sorted(self.cycles)
         all_recipients = self.database.get_all_recipients()
         all_donors = self.database.get_all_donors()
-        self.recipients_matrix = [[1 if recipient in cycle else 0 for recipient in all_recipients] for cycle in self.cycles]
-        self.donors_matrix = [[1 if self._donor_in_cycle(donor, cycle) else 0 for donor in all_donors] for cycle in self.cycles]
 
         #decision variable which cycle should be taken
         self.x = [self.model.new_bool_var(f"x{i}") for i in range(len(self.cycles))]
 
 
         #constraints
-        accumulated_overlap_r = [sum(x_i * r_ij for x_i, r_ij in zip(self.x, recipient_node)) for recipient_node in zip(*self.recipients_matrix)]
-        accumulated_overlap_d = [sum(x_i * d_ij for x_i, d_ij in zip(self.x, donor_node)) for donor_node in zip(*self.donors_matrix)]
+        for recipient in all_recipients:
+            self.model.add(sum(x_i for x_i, cycle in zip(self.x, self.cycles) if self._cycle_has_recipient(recipient, cycle)) <= 1)
 
-        for i in range(len(accumulated_overlap_r)):
-            self.model.add(accumulated_overlap_r[i] <= 1)
-
-        for i in range(len(accumulated_overlap_d)):
-            self.model.add(accumulated_overlap_d[i] <= 1)
-            
+        for donor in all_donors:
+            self.model.add(sum(x_i for x_i, cycle in zip(self.x, self.cycles) if self._cycle_has_donor(donor, cycle)) <= 1)            
+        
         # amount of recipients
         accumulated_nodes = sum(x_i * len(cycle) for cycle, x_i in zip(self.cycles, self.x))
         self.model.maximize(accumulated_nodes)
@@ -49,12 +43,16 @@ class CycleLimitingCrossoverTransplantSolver:
         self.solver = CpSolver()
         self.solver.parameters.log_search_progress = True
 
-    def _donor_in_cycle(self, donor, cycle):
+    def _cycle_has_recipient(self, recipient, cycle):
+        if recipient in cycle:
+            return True
+        return False
 
-        for i in range(len(cycle)):
-            j = i+1
-            if j > len(cycle)-1:
-                j = 0
+
+    def _cycle_has_donor(self, donor, cycle):
+        n = len(cycle)
+        for i in range(n):
+            j = (i+1) % n
 
             doner = self.graph[cycle[i]][cycle[j]]["donor"]
             if doner == donor:
@@ -66,6 +64,7 @@ class CycleLimitingCrossoverTransplantSolver:
     def _build_directed_graph(self, database) -> nx.DiGraph:
         graph = nx.DiGraph()
         donors = database.get_all_donors()
+        
         for donor in donors:
             partner = database.get_partner_recipient(donor)
             graph.add_node(partner)
