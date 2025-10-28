@@ -30,10 +30,10 @@ class CrossoverTransplantSolver:
         #constraints
         
         for donor in all_donors:
-            self.model.add(sum(x_i for x_i, edge in zip(self.x, edges) if edge["donor"] == donor) <= 1)
+            self.model.add(sum(self.x[donor] for  _, _, edge_donor in edges if edge_donor == donor) <= 1)
 
         for recipient in all_recipients:
-            self.model.add(sum(x_i for x_i, u, v in zip(self.x, edges) if v == recipient) <= 1)
+            self.model.add(sum(self.x[donor] for  _, v, _ in edges if v == recipient) <= 1)
 
 
 
