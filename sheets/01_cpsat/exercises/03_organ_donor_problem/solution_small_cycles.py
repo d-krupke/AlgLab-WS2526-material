@@ -20,6 +20,7 @@ class CycleLimitingCrossoverTransplantSolver:
 
         self.graph = self._build_directed_graph(self.database)
 
+        print("calculating cycles...")
         self.cycles = list(nx.simple_cycles(self.graph, 3))
 
         all_recipients = self.database.get_all_recipients()
@@ -62,14 +63,17 @@ class CycleLimitingCrossoverTransplantSolver:
 
 
     def _build_directed_graph(self, database) -> nx.DiGraph:
+
+        print("building graph...")
         graph = nx.DiGraph()
+
+        print("getting all donors...")
         donors = database.get_all_donors()
-        
+        print("adding egdes and nodes...")        
         for donor in donors:
             partner = database.get_partner_recipient(donor)
             graph.add_node(partner)
             compatible_recipients = database.get_compatible_recipients(donor)
-
             graph.add_nodes_from([recipient for recipient in compatible_recipients])
             graph.add_edges_from([(partner, recipient, {"donor": donor}) for recipient in compatible_recipients])
         
