@@ -24,17 +24,27 @@ class CrossoverTransplantSolver:
         all_donors = self.database.get_all_donors()
         edges = self.graph.edges(data=True)
 
-        self.x = {donor: self.model.new_bool_var(f"x{i}") for i, _, _, donor in enumerate(edges)}
+        self.x = [self.model.new_bool_var(f"x{i}") for i, _ in enumerate(edges, 0)]
 
 
         #constraints
         
         for donor in all_donors:
-            self.model.add(sum(self.x[donor] for  _, _, edge_donor in edges if edge_donor == donor) <= 1)
+            self.model.add(sum(x_i for x_i, edge in zip(self.x, edges) if edge[2]["donor"] == donor) <= 1)
 
         for recipient in all_recipients:
-            self.model.add(sum(self.x[donor] for  _, v, _ in edges if v == recipient) <= 1)
+            self.model.add(sum(x_i for x_i, edge in zip(self.x, edges) if edge[1] == recipient) <= 1)
 
+         
+        for x_i, edge in zip(self.x, edges):
+            donors = database.get_compatible_donors(edge[0])
+            pred_donations = []
+            for x_j, pred_edge in zip(self.x, edges):
+                if edge[0] == pred_edge[1] and pred_edge[2]["donor"] in donors:
+                    pred_donations.append(x_j)
+                    
+            self.model.add(x_i <= sum(pred_donations))
+        
 
 
 
@@ -59,15 +69,9 @@ class CrossoverTransplantSolver:
     def _extract_donations(self):
 
         donations = []
-        for index, cycle in enumerate(self.cycles):
+        for index, edge in enumerate(self.graph.edges(data=True)):
             if self.solver.value(self.x[index]) == 1:
-                for i in range(len(cycle)):
-                    j = i+1
-                    if j > len(cycle)-1:
-                        j = 0
-
-                    donor = self.graph[cycle[i]][cycle[j]]["donor"]
-                    donations += [Donation(donor=donor, recipient=cycle[j])]
+                donations += [Donation(donor=edge[2]["donor"], recipient=edge[1])]
 
         return donations
                         
@@ -85,6 +89,7 @@ class CrossoverTransplantSolver:
         # TODO: Implement me!
 
         status = self.solver.solve(self.model)
+        print(sum(self.solver.value(x_i) for x_i in self.x))
 
         solution = self._extract_donations()
 
