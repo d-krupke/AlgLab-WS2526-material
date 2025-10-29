@@ -104,5 +104,5 @@ class CycleLimitingCrossoverTransplantSolver:
         status = self.solver.solve(self.model)
 
         solution = self._extract_donations()
-
+        
         return Solution(donations=solution)

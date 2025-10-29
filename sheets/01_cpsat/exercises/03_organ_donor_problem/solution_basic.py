@@ -37,6 +37,17 @@ class CrossoverTransplantSolver:
 
          
         for x_i, edge in zip(self.x, edges):
+
+            donors_tmp = self.graph.out_edges(edge[1], data=True)
+            donors = [d[2]["donor"] for d in donors_tmp]
+            succ_donations = []
+            for x_j, succ_edge in zip(self.x, edges):
+                if edge[1] == succ_edge[0] and succ_edge[2]["donor"] in donors:
+                    succ_donations.append(x_j)
+                    
+            self.model.add(sum(succ_donations) <= 1)
+
+
             donors = database.get_compatible_donors(edge[0])
             pred_donations = []
             for x_j, pred_edge in zip(self.x, edges):
@@ -44,6 +55,7 @@ class CrossoverTransplantSolver:
                     pred_donations.append(x_j)
                     
             self.model.add(x_i <= sum(pred_donations))
+            #self.model.add(sum(pred_donations) <= 1)
         
 
 
