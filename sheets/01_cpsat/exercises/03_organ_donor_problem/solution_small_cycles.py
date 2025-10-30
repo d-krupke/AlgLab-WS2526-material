@@ -49,7 +49,7 @@ class CycleLimitingCrossoverTransplantSolver:
             return True
         return False
 
-
+    """ 
     def _cycle_has_donor(self, donor, cycle):
         n = len(cycle)
         for i in range(n):
@@ -59,7 +59,7 @@ class CycleLimitingCrossoverTransplantSolver:
             if doner == donor:
                 return True
         return False
-
+     """
 
 
     def _build_directed_graph(self, database) -> nx.DiGraph:
@@ -84,10 +84,9 @@ class CycleLimitingCrossoverTransplantSolver:
         donations = []
         for index, cycle in enumerate(self.cycles):
             if self.solver.value(self.x[index]) == 1:
-                for i in range(len(cycle)):
-                    j = i+1
-                    if j > len(cycle)-1:
-                        j = 0
+                n = len(cycle)
+                for i in range(n):
+                    j = (i+1) % n
 
                     donor = self.graph[cycle[i]][cycle[j]]["donor"]
                     donations += [Donation(donor=donor, recipient=cycle[j])]
