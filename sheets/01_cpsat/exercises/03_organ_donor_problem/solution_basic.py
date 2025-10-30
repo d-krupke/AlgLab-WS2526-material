@@ -74,7 +74,7 @@ class CrossoverTransplantSolver:
         donations = []
         for edge in self.graph.edges(data=True):
             if self.solver.value(self.x[(edge[0], edge[1], edge[2]["donor"])]) == 1:
-                donations += [Donation(donor=edge[2]["donor"], recipient=edge[1])]
+                donations.append(Donation(donor=edge[2]["donor"], recipient=edge[1]))
 
         return donations
                         
