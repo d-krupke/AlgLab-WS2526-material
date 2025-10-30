@@ -24,7 +24,7 @@ class CycleLimitingCrossoverTransplantSolver:
         self.cycles = list(nx.simple_cycles(self.graph, 3))
 
         all_recipients = self.database.get_all_recipients()
-        all_donors = self.database.get_all_donors()
+        # all_donors = self.database.get_all_donors()
 
         #decision variable which cycle should be taken
         self.x = [self.model.new_bool_var(f"x{i}") for i in range(len(self.cycles))]
@@ -33,10 +33,10 @@ class CycleLimitingCrossoverTransplantSolver:
         #constraints
         for recipient in all_recipients:
             self.model.add(sum(x_i for x_i, cycle in zip(self.x, self.cycles) if self._cycle_has_recipient(recipient, cycle)) <= 1)
-
+        """         
         for donor in all_donors:
             self.model.add(sum(x_i for x_i, cycle in zip(self.x, self.cycles) if self._cycle_has_donor(donor, cycle)) <= 1)            
-        
+        """        
         # amount of recipients
         accumulated_nodes = sum(x_i * len(cycle) for cycle, x_i in zip(self.cycles, self.x))
         self.model.maximize(accumulated_nodes)
