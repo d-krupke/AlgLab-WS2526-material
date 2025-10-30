@@ -15,7 +15,7 @@ class CrossoverTransplantSolver:
         self.database = database
         self.model = CpModel()
         self.solver = CpSolver()
-        self.solver.parameters.log_search_progress = False
+        self.solver.parameters.log_search_progress = True
 
         self.graph = self._build_directed_graph(self.database)
 
@@ -23,8 +23,7 @@ class CrossoverTransplantSolver:
         #self.all_donors = self.database.get_all_donors()
         self.edges = self.graph.edges(data=True)
 
-        self.x = {(edge[0], edge[1], edge[2]["donor"]): self.model.new_bool_var(f"x{i}") for i, edge in enumerate(self.edges, 0)}
-
+        self.x = {(edge[0], edge[1]): self.model.new_bool_var(f"x{i}") for i, edge in enumerate(self.edges, 0)}
 
         #constraints
         """     # this is actually redundant        
@@ -34,17 +33,18 @@ class CrossoverTransplantSolver:
         for recipient in self.all_recipients:
             self.model.add(sum(self.x[(edge[0], edge[1], edge[2]["donor"])] for edge in self.edges if edge[1] == recipient) <= 1)
 
-         """         
-        for edge in self.edges:
+         """        
+        # iterate over nodes, NOT EDGES 
+        for node in self.graph.nodes():
 
-            donors_out = self.graph.out_edges(edge[1], data=True)
-            succ_donations = [self.x[(succ_edge[0], succ_edge[1], succ_edge[2]["donor"])] for succ_edge in donors_out]                    
+            donors_out = self.graph.out_edges(node, data=True)
+            succ_donations = [self.x[(succ_edge[0], succ_edge[1])] for succ_edge in donors_out]                    
             self.model.add(sum(succ_donations) <= 1)
 
 
-            donors_in = self.graph.in_edges(edge[0], data= True)
-            pred_donations = [self.x[(pred_edge[0], pred_edge[1], pred_edge[2]["donor"])] for pred_edge in donors_in]
-            self.model.add(self.x[(edge[0], edge[1], edge[2]["donor"])] <= sum(pred_donations))
+            donors_in = self.graph.in_edges(node, data= True)
+            pred_donations = [self.x[(pred_edge[0], pred_edge[1])] for pred_edge in donors_in]
+            self.model.add(sum(pred_donations) <= sum(succ_donations))
             #self.model.add(sum(pred_donations) <= 1)
         
 
@@ -72,7 +72,7 @@ class CrossoverTransplantSolver:
 
         donations = []
         for edge in self.graph.edges(data=True):
-            if self.solver.value(self.x[(edge[0], edge[1], edge[2]["donor"])]) == 1:
+            if self.solver.value(self.x[(edge[0], edge[1])]) == 1:
                 donations.append(Donation(donor=edge[2]["donor"], recipient=edge[1]))
 
         return donations
@@ -95,4 +95,3 @@ class CrossoverTransplantSolver:
         solution = self._extract_donations()
 
         return Solution(donations=solution)
-
