@@ -45,7 +45,6 @@ class CrossoverTransplantSolver:
 
             donors_in = self.graph.in_edges(edge[0], data= True)
             pred_donations = [self.x[(pred_edge[0], pred_edge[1], pred_edge[2]["donor"])] for pred_edge in donors_in]
-                    
             self.model.add(self.x[(edge[0], edge[1], edge[2]["donor"])] <= sum(pred_donations))
             #self.model.add(sum(pred_donations) <= 1)
         
