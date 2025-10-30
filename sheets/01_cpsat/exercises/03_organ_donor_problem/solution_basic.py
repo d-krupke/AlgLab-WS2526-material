@@ -13,29 +13,28 @@ class CrossoverTransplantSolver:
         :param Database database: The organ donor/recipients database.
         """
         self.database = database
-        # TODO: Implement me!
         self.model = CpModel()
         self.solver = CpSolver()
         self.solver.parameters.log_search_progress = False
 
         self.graph = self._build_directed_graph(self.database)
 
-        self.all_recipients = self.database.get_all_recipients()
-        self.all_donors = self.database.get_all_donors()
+        #self.all_recipients = self.database.get_all_recipients()
+        #self.all_donors = self.database.get_all_donors()
         self.edges = self.graph.edges(data=True)
 
         self.x = {(edge[0], edge[1], edge[2]["donor"]): self.model.new_bool_var(f"x{i}") for i, edge in enumerate(self.edges, 0)}
 
 
         #constraints
-        
+        """     # this is actually redundant        
         for donor in self.all_donors:
             self.model.add(sum(self.x[(edge[0], edge[1], edge[2]["donor"])] for edge in self.edges if edge[2]["donor"] == donor) <= 1)
 
         for recipient in self.all_recipients:
             self.model.add(sum(self.x[(edge[0], edge[1], edge[2]["donor"])] for edge in self.edges if edge[1] == recipient) <= 1)
 
-         
+         """         
         for edge in self.edges:
 
             donors_out = self.graph.out_edges(edge[1], data=True)
@@ -96,3 +95,4 @@ class CrossoverTransplantSolver:
         solution = self._extract_donations()
 
         return Solution(donations=solution)
+
