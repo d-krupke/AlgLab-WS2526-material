@@ -154,6 +154,11 @@ class BnBSearch:
                 <= self.solutions.best_solution_value()
             ):
                 logging.info("Global prune at iteration %d", iteration)
+                for pruned_node in self.search_strategy.nodes_in_queue():
+                    pruned_node.status = NodeStatus.PRUNED
+                    self.progress_tracker.on_node_pruned(
+                        pruned_node, self.solutions.best_solution()
+                    )
                 break
 
         else:

@@ -69,6 +69,12 @@ class ProgressTracker:
             f"[Heuristic] node {node.node_id} -> new feasible solution {sol} (value={sol.value():.3f})"
         )
 
+    def on_node_pruned(
+        self, node: BnBNode, best_solution: HeuristicSolution | None
+    ) -> None:
+        """Called whenever a node is pruned."""
+        self._vis.on_node_pruned(node, best_solution)
+
     def start_search(self) -> None:
         """Initialize search reporting and print header."""
         self._start_time = datetime.now()
@@ -123,4 +129,6 @@ class ProgressTracker:
             print(f"Elapsed time: {duration}.")
         # write visualization
         ts = datetime.now().strftime("%Y-%m-%d_%Hh-%Mm-%Ss")
-        self._vis.visualize(self._solutions.best_solution(), f"bnb-{self._instance.id}_{ts}.html")
+        self._vis.visualize(
+            self._solutions.best_solution(), f"bnb-{self._instance.id}_{ts}.html"
+        )

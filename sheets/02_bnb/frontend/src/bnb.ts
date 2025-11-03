@@ -14,7 +14,6 @@ interface Dimensions {
   /** The inner height of the SVG. */
   height: number;
 }
-
 interface TemplateMap {
   /** Mapping from iteration index of a node to an HTML string for that iteration. */
   [index: number]: string;
@@ -79,7 +78,7 @@ function initialRender(
   node_tooltips_param: TemplateMap,
   iteration_info_param: TemplateMap,
   iteration_solutions_param: TemplateMap,
-  iterations_param: number[]
+  iterations_param: number[],
 ): void {
   treeData = tree_data_param;
   iterationInfo = iteration_info_param;
@@ -169,7 +168,7 @@ function buildTreeLayout(dimensions: Dimensions) {
 function renderNodesAndLinks(
   root: BnBNode,
   g: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
-  refs: DomElements
+  refs: DomElements,
 ) {
   g.selectAll<SVGPathElement, BnBLink>(".link")
     .data(root.links())
@@ -181,7 +180,7 @@ function renderNodesAndLinks(
       d3
         .linkHorizontal<BnBLink, BnBNode>()
         .x((d) => d.y ?? 0)
-        .y((d) => d.x ?? 0)
+        .y((d) => d.x ?? 0),
     );
 
   const nodes = g
@@ -197,11 +196,11 @@ function renderNodesAndLinks(
     .attr("r", radius)
     .style("fill", (d) => d.data.color)
     .style("cursor", (d) => {
-      const processed_at = d.data.processed_at
-      return processed_at !== null ? "pointer" : "default"
+      const processed_at = d.data.processed_at;
+      return processed_at !== null ? "pointer" : "default";
     })
     .on("click", (_: MouseEvent, d) => {
-      const processed_at = d.data.processed_at
+      const processed_at = d.data.processed_at;
       if (processed_at === null) return;
 
       refs.indexSlider.value = String(processed_at);
@@ -211,7 +210,7 @@ function renderNodesAndLinks(
     .attr("data-bs-toggle", "tooltip")
     .attr("data-bs-custom-class", "node-tooltip")
     .attr("data-bs-title", (d) => {
-      return nodeTooltips[iterations[d.data.processed_at ?? 0]];
+      return nodeTooltips[d.data.node_id];
     });
 
   nodes
@@ -229,12 +228,12 @@ function renderNodesAndLinks(
  */
 function setupZoom(
   svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>,
-  g: d3.Selection<SVGGElement, unknown, HTMLElement, any>
+  g: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
 ) {
   const zoom = d3
     .zoom<SVGSVGElement, unknown>()
     .scaleExtent([0.5, 8])
-    .on("zoom", (event) => g.attr("transform", event.transform));
+    .on("zoom", (event: any) => g.attr("transform", event.transform));
   svg.call(zoom).on("wheel", (event: WheelEvent) => event.preventDefault());
 }
 
@@ -253,7 +252,12 @@ function setupTableSort() {
 function updateOpacity(indexSlider: HTMLInputElement, svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>) {
   function getOpacity(d: BnBNode) {
     if (d.data.created_at > Number(indexSlider.value)) return 0.1;
-    if (d.data.processed_at === null || d.data.processed_at === undefined || d.data.processed_at > Number(indexSlider.value)) return 0.5;
+    if (
+      d.data.processed_at === null ||
+      d.data.processed_at === undefined ||
+      d.data.processed_at > Number(indexSlider.value)
+    )
+      return 0.5;
     return 1.0;
   }
 
@@ -381,10 +385,10 @@ function setupTooltips() {
             () => {
               this.hide();
             },
-            { once: true }
+            { once: true },
           );
         },
-        { once: true }
+        { once: true },
       );
     }
   };
@@ -404,7 +408,7 @@ function setupTooltips() {
 // Enable drag resizing of horizontal split panels
 function setupResizePanels() {
   document.querySelectorAll<HTMLDivElement>(".split-container").forEach((container) => {
-    const panelDividerSelector = container.dataset.panelDivider ? container.dataset.panelDivider : ".panel-divider"
+    const panelDividerSelector = container.dataset.panelDivider ? container.dataset.panelDivider : ".panel-divider";
     const divider = getElement<HTMLDivElement>(panelDividerSelector, container);
     const left = getElement<HTMLDivElement>(".panel-left", container); // Left Panel
 
@@ -457,6 +461,6 @@ document.addEventListener("DOMContentLoaded", () => {
     data.node_tooltips,
     data.iteration_info,
     data.iteration_solution_details,
-    data.iterations
+    data.iterations,
   );
 });

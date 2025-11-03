@@ -25,10 +25,7 @@ class Instance(BaseModel):
     capacity: int = Field(
         ..., ge=0, description="Capacity of the knapsack problem instance"
     )
-    
-    id: int = Field(
-        default=1, ge=1, description="Id of the instance"
-    )
+    id: int = Field(default=1, ge=1, description="Id of the instance")
 
     # Prevent the model from being modified after creation
     model_config = ConfigDict(frozen=True)

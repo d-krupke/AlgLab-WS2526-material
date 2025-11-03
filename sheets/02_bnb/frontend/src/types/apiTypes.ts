@@ -27,13 +27,17 @@ export interface BnBTree {
    */
   created_at: number;
   /**
-   * The time when the node was processed. This may be later than its creation time. It may also be null if it got pruned.
+   * The time when the node was processed. This may be later than its creation time. It may also be None if it got pruned.
    */
   processed_at?: number | null;
   /**
    * Label of the node in the visualization.
    */
   label: string;
+  /**
+   * Status of the node in the visualization.
+   */
+  status: "integral" | "infeasible" | "feasible";
   /**
    * Color of the node in the visualization.
    */

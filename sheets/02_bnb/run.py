@@ -52,9 +52,9 @@ def run_first_instance():
     logging.info(
         "Optimal solution found, that's already good. Now checking number of iterations."
     )
-    assert (
-        bnb.progress_tracker.num_iterations <= 200
-    ), "You should not need more than 200 iterations."
+    assert bnb.progress_tracker.num_iterations <= 200, (
+        "You should not need more than 200 iterations."
+    )
     assert bnb.progress_tracker.num_iterations <= 50, "Try to get below 50 iterations!"
 
 
@@ -98,9 +98,9 @@ def run_second_instance():
     logging.info(
         "Optimal solution found, that's already good. Now checking number of iterations."
     )
-    assert (
-        bnb.progress_tracker.num_iterations <= 200
-    ), "You should not need more than 200 iterations."
+    assert bnb.progress_tracker.num_iterations <= 200, (
+        "You should not need more than 200 iterations."
+    )
     assert bnb.progress_tracker.num_iterations <= 10, "Try to get below 10 iterations!"
 
 
@@ -146,16 +146,16 @@ def run_third_instance():
     logging.info(
         "Finished search with %d iterations.", bnb.progress_tracker.num_iterations
     )
-    assert (
-        bnb.progress_tracker.upper_bound() == 171
-    ), "The objective value should be 171."
+    assert bnb.progress_tracker.upper_bound() == 171, (
+        "The objective value should be 171."
+    )
     assert bnb.progress_tracker.lower_bound() == 171, "The bound should be 171."
     logging.info(
         "Optimal solution found, that's already good. Now checking number of iterations."
     )
-    assert (
-        bnb.progress_tracker.num_iterations <= 200
-    ), "You should not need more than 200 iterations."
+    assert bnb.progress_tracker.num_iterations <= 200, (
+        "You should not need more than 200 iterations."
+    )
     assert bnb.progress_tracker.num_iterations <= 30, "Try to get below 30 iterations!"
 
 

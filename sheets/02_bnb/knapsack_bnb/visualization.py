@@ -5,6 +5,7 @@ You do not need to modify this code.
 
 import logging
 from pathlib import Path
+from typing import Literal
 
 from jinja2 import Template
 from pydantic import BaseModel, Field
@@ -14,6 +15,8 @@ from .heuristics import HeuristicSolution
 from .instance import Instance
 from .relaxation import RelaxedSolution
 
+RELAXED_STATUS = Literal["integral", "infeasible", "feasible"]
+
 
 class BnBTree(BaseModel):
     """
@@ -22,14 +25,23 @@ class BnBTree(BaseModel):
     """
 
     node_id: int = Field(..., description="The ID of the root node.")
-    lb: float | None = Field(default=None, description="The lower bound of the node from the heuristic solution. May also be None if it got pruned.")
-    ub: float | None = Field(default=None, description="The upper bound from the relaxed solution. May also be None if it got pruned.")
+    lb: float | None = Field(
+        default=None,
+        description="The lower bound of the node from the heuristic solution. May also be None if it got pruned.",
+    )
+    ub: float | None = Field(
+        default=None,
+        description="The upper bound from the relaxed solution. May also be None if it got pruned.",
+    )
     created_at: int = Field(..., description="The time when the node was created.")
     processed_at: int | None = Field(
         default=None,
         description="The time when the node was processed. This may be later than its creation time. It may also be None if it got pruned.",
     )
     label: str = Field(..., description="Label of the node in the visualization.")
+    status: RELAXED_STATUS = Field(
+        ..., description="Status of the node in the visualization."
+    )
     color: str = Field(..., description="Color of the node in the visualization.")
     children: list["BnBTree"] = Field(
         default_factory=list, description="Children of the node."
@@ -40,7 +52,7 @@ class BnBVisualization:
     def __init__(self, instance: Instance):
         self.root: BnBTree | None = None
         self.node_links: dict[int, BnBTree] = {}
-        self.instance = instance
+        self.instance: Instance = instance
         self.node_detail_texts: dict[int, str] = {}
         self.iteration_info_detail_texts: dict[int, str] = {}
         self.iteration_solution_details: dict[int, str] = {}
@@ -56,13 +68,24 @@ class BnBVisualization:
             return "#20c997"
         return "#adb5bd" if not node.relaxed_solution.is_infeasible() else "#dc3545"
 
+    def _get_node_status(self, node: BnBNode) -> RELAXED_STATUS:
+        if (
+            node.relaxed_solution.does_obey_capacity_constraint()
+            and node.relaxed_solution.is_integral()
+            and not node.relaxed_solution.is_infeasible()
+        ):
+            return "integral"
+        return "feasible" if not node.relaxed_solution.is_infeasible() else "infeasible"
+
     def on_new_node_in_tree(self, node: BnBNode):
         color = self._get_node_color(node)
+        status = self._get_node_status(node)
         label = f"{node.relaxed_solution.upper_bound:.1f}"
         data = BnBTree(
             node_id=node.node_id,
             label=label,
             color=color,
+            status=status,
             children=[],
             created_at=len(self.iterations),
         )
@@ -90,16 +113,20 @@ class BnBVisualization:
         """
         self.iterations.append(node.node_id)
         # Update BnB data
-        self.node_links[node.node_id].processed_at = len(self.iterations) - 1
-        self.node_links[node.node_id].lb = lb
-        self.node_links[node.node_id].ub = ub
+        vis_node = self.node_links[node.node_id]
+        vis_node.processed_at = len(self.iterations) - 1
+        vis_node.lb = lb
+        vis_node.ub = ub
         if node.parent_id is not None:
             parent_processed_at = self.node_links[node.parent_id].processed_at
             node_processed_at = self.node_links[node.node_id].processed_at
             assert parent_processed_at is not None
             assert node_processed_at is not None
             assert parent_processed_at < node_processed_at
-        with (Path(__file__).parent / "./templates/node_details.j2.html").open() as file:
+
+        with (
+            Path(__file__).parent / "./templates/node_details.j2.html"
+        ).open() as file:
             # Render the node details
             template_node_info = Template(file.read())
             node_info = template_node_info.render(
@@ -138,21 +165,57 @@ class BnBVisualization:
             )
             self.iteration_solution_details[node.node_id] = iteration_solutions
 
-        with (Path(__file__).parent / "./templates/node_tooltip.j2.html").open() as file:
+        with (
+            Path(__file__).parent / "./templates/node_tooltip.j2.html"
+        ).open() as file:
             node_tooltip_template = Template(file.read())
             node_tooltip = node_tooltip_template.render(
-                node=node, 
+                node=node,
                 included_items=node.branching_decisions.included_items(),
-                included_weight=sum(self.instance.items[i].weight for i in node.branching_decisions.included_items()),
+                included_weight=sum(
+                    self.instance.items[i].weight
+                    for i in node.branching_decisions.included_items()
+                ),
                 excluded_items=node.branching_decisions.excluded_items(),
                 iteration=len(self.iterations) - 1,
                 iterations=self.iterations,
-                lb=lb, 
-                current_heuristic=node.heuristic_solution, 
+                lb=lb,
+                current_heuristic=node.heuristic_solution,
             )
             self.node_tooltips[node.node_id] = node_tooltip
 
-    def visualize(self, end_solution: RelaxedSolution | None, path: str = "output.html"):
+    def on_node_pruned(
+        self,
+        node: BnBNode,
+        best_solution: HeuristicSolution | None,
+    ):
+        """
+        Called when a node is globally pruned. Updates the jinja templates with information about the node.
+        Args:
+            node (BnBNode): The node that was processed.
+
+        """
+        with (
+            Path(__file__).parent / "./templates/node_tooltip.j2.html"
+        ).open() as file:
+            node_tooltip_template = Template(file.read())
+            node_tooltip = node_tooltip_template.render(
+                node=node,
+                lb=best_solution.value() if best_solution else None,
+                included_items=node.branching_decisions.included_items(),
+                included_weight=sum(
+                    self.instance.items[i].weight
+                    for i in node.branching_decisions.included_items()
+                ),
+                excluded_items=node.branching_decisions.excluded_items(),
+                iteration=len(self.iterations) - 1,
+                iterations=self.iterations,
+            )
+            self.node_tooltips[node.node_id] = node_tooltip
+
+    def visualize(
+        self, end_solution: RelaxedSolution | None, path: str = "output.html"
+    ):
         """
         Visualizes the branch-and-bound tree and saves it to an HTML file.
         Opens the file in the default web browser.
@@ -171,10 +234,18 @@ class BnBVisualization:
         ).open() as file:
             # Render instance information
             instance_template = Template(file.read())
-            instance_info = instance_template.render(instance=self.instance, best_solution=end_solution)
-        with (Path(__file__).parent / "./templates/solution_details.j2.html").open() as file:
+            instance_info = instance_template.render(
+                instance=self.instance, best_solution=end_solution
+            )
+        with (
+            Path(__file__).parent / "./templates/solution_details.j2.html"
+        ).open() as file:
             solution_template = Template(file.read())
-            solution_details = solution_template.render(instance=self.instance, num_iterations=len(self.iterations) - 1, best_solution=end_solution)
+            solution_details = solution_template.render(
+                instance=self.instance,
+                num_iterations=len(self.iterations) - 1,
+                best_solution=end_solution,
+            )
 
         # Render main html
         with (Path(__file__).parent / "./templates/bnb.j2.html").open() as file:
@@ -192,7 +263,7 @@ class BnBVisualization:
                         instance=self.instance,
                         solution_details=solution_details,
                         node_details=self.node_detail_texts,
-                        node_tooltips=self.node_tooltips
+                        node_tooltips=self.node_tooltips,
                     )
                 )
                 logging.info("Visualization saved to %s", path)
