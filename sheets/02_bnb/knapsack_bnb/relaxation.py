@@ -150,8 +150,9 @@ class MyRelaxationSolver(RelaxationSolver):
                 items_dict[item] = x
                 end_reached = 1
 
-            values_sum += item.value
-            weights_sum += item.weight
-            items_dict[item] = 1.0
+            if end_reached == 0:
+                values_sum += item.value
+                weights_sum += item.weight
+                items_dict[item] = 1.0
 
         return RelaxedSolution(instance, items_dict.values(), values_sum)
