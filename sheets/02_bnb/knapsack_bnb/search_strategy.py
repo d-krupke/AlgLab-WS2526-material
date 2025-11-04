@@ -92,6 +92,8 @@ def my_search_order(node: BnBNode) -> Any:
     """
     Example default: constant priority.
     """
-    return 0
+    if node.depth == 0: return 0
+    x = sum(val * i for i, val in enumerate(node.branching_decisions) if val is not None)
+    return x
 
 

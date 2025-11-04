@@ -59,6 +59,24 @@ class MyBranchingStrategy(BranchingStrategy):
     """
 
     def make_branching_decisions(self, node: BnBNode) -> Tuple[BranchingDecisions, ...]:
+                
+
+        if node.heuristic_solution:
+
+            if node.heuristic_solution.upper_bound >= int(node.relaxed_solution.upper_bound):
+                return ()
+        
+            potential_bound = int(node.relaxed_solution.upper_bound)
+            solution_heu = node.heuristic_solution.upper_bound
+            diff = potential_bound - solution_heu
+            found = 0
+            for item, x in zip(node.relaxed_solution.instance.items, node.branching_decisions):
+                if x is None and item.value <= diff:
+                    found = 1
+                    break
+            if found != 1:
+                return ()
+        
         # placeholder: branch on the first unfixed variable
         first_unfixed = min(
             (i for i, val in enumerate(node.branching_decisions) if val is None),

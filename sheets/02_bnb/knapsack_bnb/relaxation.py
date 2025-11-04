@@ -145,7 +145,7 @@ class MyRelaxationSolver(RelaxationSolver):
                 continue
 
             if weights_sum + item.weight > adjusted_cap:
-                x = round((adjusted_cap - weights_sum) / item.weight, 2)
+                x = (adjusted_cap - weights_sum) / item.weight
                 values_sum += x * item.value
                 items_dict[item] = x
                 end_reached = 1

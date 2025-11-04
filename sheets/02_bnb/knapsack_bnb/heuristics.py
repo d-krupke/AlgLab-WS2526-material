@@ -74,6 +74,17 @@ class MyHeuristic(Heuristics):
                 upper -= adj_selection[i] * instance.items[i].value
                 adj_selection[i] = 0
                 break
+
+        best_value = 0
+        best_idx = 0
+        for i in range(len(adj_selection)):
+            if adj_selection[i] is None and instance.items[i].weight + upper <= instance.capacity and instance.items[i].value > best_idx:
+                best_idx = i
+        
+        adj_selection[best_idx] = 1
+        upper += instance.items[best_idx].value
+
+
         heuristic_sol = HeuristicSolution(instance, adj_selection, upper)
         return (heuristic_sol,)
        
