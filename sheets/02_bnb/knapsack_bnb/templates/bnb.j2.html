@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>({{instance.id}}) Branch & Bound Visualization</title>
+    <!-- Core styling -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+
+    <link rel="stylesheet" href="./knapsack_bnb/static/bnb.css" />
+  </head>
+
+  <body>
+    <div class="container mt-4">
+      <h1>Branch & Bound Visualization (Instance {{instance.id}})</h1>
+      <p class="text-muted">
+        This page visualizes the branch and bound algorithm for the 0/1 knapsack problem. The tree is constructed using
+        D3.js and the slider allows you to see the progress of the algorithm.
+      </p>
+      {#
+      <div class="alert alert-info alert-dismissible fade show" role="alert">
+        You may need to reload the page if the graph does not display correctly.
+      </div>
+      #}
+
+      <div class="split-container gap-1 my-3" data-panel-divider="#slider-solution-details-divider">
+        <div class="panel-left px-0">
+          <div class="split-container gap-0 mb-1">
+            <div class="panel-left px-0" style="flex-basis: 50%;">
+              <div class="card">
+                <h4 class="card-header">
+                  Iteration Slider&nbsp;
+                  <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                    <i
+                      class="bi bi-eye-fill eye-icon js-eye-icon"
+                      role="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#iteration-slider-text"
+                      aria-expanded="true"
+                      aria-controls="iteration-slider-text"
+                    ></i>
+                  </span>
+                </h4>
+                <div class="card-body py-1">
+                  <div class="collapse show mt-2" id="iteration-slider-text">
+                    <div class="input-group d-flex justify-content-center mb-2 mx-auto">
+                      <button id="decrementButton" type="button" class="btn btn-outline-primary px-3 fs-5 fw-medium">
+                        -
+                      </button>
+                      <span
+                        id="sliderValue"
+                        class="form-control text-center fw-semibold fs-5"
+                        style="max-width: 60px"
+                        readonly
+                        >{{ num_iterations }}</span
+                      >
+                      <button id="incrementButton" type="button" class="btn btn-outline-primary px-3 fs-5 fw-medium">
+                        +
+                      </button>
+                    </div>
+                    <input
+                      type="range"
+                      class="form-range"
+                      id="indexSlider"
+                      min="0"
+                      max="{{ num_iterations }}"
+                      value="{{ num_iterations }}"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          <div class="panel-divider"></div>
+
+          <div class="panel-right px-0 d-flex">
+            <div class="card flex-fill">
+              <h4 class="card-header">
+                Iteration Solution Details&nbsp;
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                  <i
+                    class="bi bi-eye-fill eye-icon js-eye-icon"
+                    role="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#iteration-solution-details"
+                    aria-expanded="true"
+                    aria-controls="iteration-solutions-details"
+                  ></i>
+                </span>
+              </h4>
+              <div class="card-body p-0">
+                <div class="collapse show" id="iteration-solution-details">Here come iteration solution details</div>
+              </div>
+            </div>
+          </div>
+          </div>  
+            <div class="card">
+              <div class="graph-container">
+                <svg id="bnb-graph"></svg>
+              </div>
+            </div>
+          </div>
+
+        <div class="panel-divider px-0" id="slider-solution-details-divider"></div>
+
+        <div class="panel-right px-0">
+          <div class="card">
+            <h4 class="card-header">
+              Iteration Information&nbsp;(Capacity: <b>{{instance.capacity}}</b>)&nbsp;
+              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                <i
+                  class="bi bi-eye-fill eye-icon js-eye-icon"
+                  role="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#iteration-info"
+                  aria-expanded="true"
+                  aria-controls="iteration-info"
+                ></i>
+              </span>
+            </h4>
+            <div class="card-body p-0">
+              <div class="collapse show" id="iteration-info"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="split-container gap-1">
+        <div class="panel-left px-0">
+          <div class="card">
+            <h4 class="card-header">
+              Instance Information&nbsp;(Capacity: <b>{{instance.capacity}}</b>)&nbsp;
+              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                <i
+                  class="bi bi-eye-fill eye-icon js-eye-icon"
+                  role="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#instance-card-text"
+                  aria-expanded="true"
+                  aria-controls="instance-card-text"
+                ></i>
+              </span>
+            </h4>
+            <div class="card-body">
+              <div class="collapse show" id="instance-card-text">{{ instance_info }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-divider"></div>
+
+        <div class="panel-right px-0 d-flex flex-column">
+          <div class="card">
+            <h4 class="card-header">
+              Final Solution&nbsp;
+              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                <i
+                  class="bi bi-eye-fill eye-icon js-eye-icon"
+                  role="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#solution-card-text"
+                  aria-expanded="true"
+                  aria-controls="solution-card-text"
+                ></i>
+              </span>
+            </h4>
+            <div class="card-body">
+              <div class="collapse show" id="solution-card-text">{{ solution_details }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="card my-3" id="node-details">Click on a node to see details here.</div> -->
+    </div>
+
+    <script src="https://unpkg.com/tablesort@latest/dist/tablesort.min.js"></script>
+    <script src="https://unpkg.com/tablesort@latest/dist/sorts/tablesort.number.min.js"></script>
+    <script id="bnb-data">
+      const BNB_DATA = {
+        "treeData": {{ tree_data | safe }},
+        "node_tooltips": {{ node_tooltips | safe }},
+        "iteration_info": {{ iteration_info | safe }},
+        "iteration_solution_details": {{ iteration_solution_details | safe }},
+        "iterations": {{ iterations | safe }}
+      }
+    </script>
+    <script src="./knapsack_bnb/static/bnb.js"></script>
+  </body>
+</html>

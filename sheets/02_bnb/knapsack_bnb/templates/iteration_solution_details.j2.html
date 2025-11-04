@@ -1,0 +1,45 @@
+{% macro value_cell(solution) -%}
+<td>
+  {% if solution %}
+    {{ solution.value() | round(2) }}
+  {% else %}
+    -
+  {% endif %}
+</td>
+{%- endmacro %}
+{% macro weight_cell(solution) -%}
+<td>
+  {% if solution %}
+    {{ solution.weight() }}
+  {% else %}
+    -
+  {% endif %}
+</td>
+{%- endmacro %}
+
+<div class="table-responsive mx-auto" style="max-width: 600px">
+  <table class="table table-sm table-hover m-0" id="iteration-solutions-table">
+    <thead class="table-light">
+      <tr>
+        <th scope="col" class="right-border-cell"></th>
+        <th scope="col">Heuristic</th>
+        <th scope="col">Best Heuristic</th>
+        <th scope="col">Relaxed</th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      <tr>
+        <th scope="row" class="right-border-cell">&sum; Value</th>
+        {{ value_cell(current_heuristic) }}
+        {{ value_cell(best_solution) }}
+        {{ value_cell(current_relaxed) }}
+      </tr>
+      <tr>
+        <th scope="row" class="right-border-cell">&sum; Weight</th>
+        {{ weight_cell(current_heuristic) }}
+        {{ weight_cell(best_solution) }}
+        {{ weight_cell(current_relaxed) }}
+      </tr>
+    </tbody>
+  </table>
+</div>

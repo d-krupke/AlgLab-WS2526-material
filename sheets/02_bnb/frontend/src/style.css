@@ -1,0 +1,148 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* color-scheme: light dark; */
+  /* color: rgba(255, 255, 255, 0.87); */
+  /* background-color: #242424; */
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* BnB Graph */
+.graph-container {
+  width: 100%;
+  /* height: 90vh; */
+  overflow: hidden;
+}
+
+.node circle {
+  fill: #fff;
+}
+
+.current-node {
+  stroke: var(--bs-primary);
+  stroke-width: 5px;
+  stroke-opacity: 0.4;
+}
+
+.node text {
+  font: 1.1rem sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
+}
+
+#node-details {
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-top: 10px;
+}
+
+.node-tooltip {
+  --bs-tooltip-font-size: 1rem;
+  --bs-tooltip-max-width: 370px;
+  /* --bs-tooltip-bg: violet; */
+  /* white-space: nowrap; */
+}
+
+/* Eye icon to toggle visibility */
+.eye-icon {
+  color: rgb(77, 77, 77);
+  cursor: pointer;
+}
+
+/* Index slider */
+.form-range {
+  cursor: pointer;
+}
+
+/* Tables */
+/* Add a right border after certain columns */
+.right-border-cell {
+  border-right: 1px solid var(--bs-table-border-color);
+}
+
+/* Split panels */
+.split-container {
+  display: flex;
+}
+
+.panel-left {
+  flex: 0 0 60%;
+}
+
+.panel-right {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.panel-divider {
+  flex: 0 0 auto;
+  background: transparent;
+  width: 0.3rem;
+  border-radius: 1rem;
+  cursor: col-resize;
+  /* margin: 0 0 0 auto; */
+
+  transition: background-color 0.2s;
+}
+
+.panel-divider:hover,
+.panel-divider.active {
+  background: var(--bs-secondary);
+}
+
+/* Tablesort Styles - Arrow placed next to column headers */
+th[role="columnheader"]:not(.no-sort) {
+  cursor: pointer;
+  position: relative;
+}
+
+th[role="columnheader"]:not(.no-sort):after {
+  content: "";
+  display: inline-block;
+  margin-left: 0.15em;
+  margin-bottom: 0.2em;
+  vertical-align: middle;
+  border-width: 0 4px 4px;
+  border-style: solid;
+  border-color: #404040 transparent;
+  visibility: hidden;
+  opacity: 0;
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+th[aria-sort="ascending"]:not(.no-sort):after {
+  border-bottom: none;
+  border-width: 4px 4px 0;
+}
+
+th[aria-sort]:not(.no-sort):after {
+  visibility: visible;
+  opacity: 0.4;
+}
+
+th[role="columnheader"]:not(.no-sort):focus:after,
+th[role="columnheader"]:not(.no-sort):hover:after {
+  visibility: visible;
+  opacity: 1;
+}

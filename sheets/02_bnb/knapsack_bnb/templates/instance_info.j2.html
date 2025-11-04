@@ -1,0 +1,40 @@
+<div class="table-responsive mx-auto" style="max-width: 600px">
+  <table class="table table-sm table-hover" id="instance-table">
+    <thead class="table-light">
+      <tr>
+        <th scope="col" class="right-border-cell">Item</th>
+        <th scope="col">Value</th>
+        <th scope="col">Weight</th>
+        <th scope="col" class="right-border-cell" data-sort-reverse>
+          <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mfrac class="fw-bold fs-5">
+              <mrow>
+                <mtext>Value</mtext>
+              </mrow>
+              <mrow>
+                <mtext>Weight</mtext>
+              </mrow>
+            </mfrac>
+          </math>
+        </th>
+        <th scope="col" data-sort-reverse data-sort-default>Final Solution</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in instance.items %} {% set value_weight_ratio = (item.value/item.weight)|round(2) %} {% set
+      item_choice = best_solution.selection[loop.index-1] %}
+      <tr>
+        <th scope="row" class="right-border-cell">{{loop.index-1}}</th>
+        <td>{{item.value}}</td>
+        <td>{{item.weight}}</td>
+        <td class="right-border-cell">{{value_weight_ratio}}</td>
+        {% if item_choice == 1 %}
+        <td data-sort="{{value_weight_ratio}}" class="text-success">{{item_choice}}</td>
+        {% else %}
+        <td data-sort="{{ -1 / value_weight_ratio }}" class="text-danger">{{item_choice}}</td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

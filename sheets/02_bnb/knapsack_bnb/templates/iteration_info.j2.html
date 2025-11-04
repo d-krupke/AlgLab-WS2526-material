@@ -1,0 +1,53 @@
+{% macro solution_cell(solution, iteration, sortkey) -%} 
+{% if solution %} 
+{% set val = solution.selection[iteration] %}
+<td
+  data-sort="{{sortkey * val}}"
+  class="{% if val == 1 %}text-success{% elif val == 0 %}text-danger{% else %}text-warning-emphasis{% endif %}"
+>
+  {{val | round(2)}}
+</td>
+{% else %}
+  <td>-</td>
+{% endif %} 
+{%- endmacro%}
+
+<div class="table-responsive mx-auto" style="max-width: 600px">
+  <table class="table table-sm table-hover m-0" id="iteration-table">
+    <thead class="table-light">
+      <tr>
+        <th scope="col" class="pe-3 right-border-cell">i</th>
+        <th scope="col" class="ps-2">Value</th>
+        <th scope="col">Weight</th>
+        <th scope="col" class="right-border-cell" data-sort-reverse data-sort-default>
+          <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mfrac class="fw-bold fs-5">
+              <mrow>
+                <mtext>Value</mtext>
+              </mrow>
+              <mrow>
+                <mtext>Weight</mtext>
+              </mrow>
+            </mfrac>
+          </math>
+        </th>
+        <th scope="col" data-sort-reverse>Heuristic</th>
+        <th scope="col" data-sort-reverse>Best Heu</th>
+        <th scope="col" data-sort-reverse>Relaxed</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in instance.items %} {% set value_weight_ratio = (item.value/item.weight)|round(2) %} {% set iteration
+      = loop.index - 1 %}
+      <tr>
+        <th scope="row" class="right-border-cell">{{iteration}}</th>
+        <td>{{item.value}}</td>
+        <td>{{item.weight}}</td>
+        <td class="right-border-cell">{{value_weight_ratio}}</td>
+        {{solution_cell(current_heuristic, iteration, value_weight_ratio)}} {{solution_cell(best_solution, iteration,
+        value_weight_ratio)}} {{solution_cell(node.relaxed_solution, iteration, value_weight_ratio)}}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

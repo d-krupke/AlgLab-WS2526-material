@@ -1,0 +1,68 @@
+<div class="card-body">
+  <h5 class="card-title mb-0">
+    Node Details&nbsp;
+    <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+      <i
+        class="bi bi-eye-fill eye-icon js-eye-icon"
+        role="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#node-card-text"
+        aria-expanded="true"
+        aria-controls="node-card-text"
+      ></i>
+    </span>
+  </h5>
+  <div class="collapse show" id="node-card-text">
+    <div class="card-body">
+      <div class="row mb-6">
+        <div class="col-md-6">
+          <p class="mb-0"><b>Lower Bound:</b> {{ lb }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-0"><b>Upper Bound:</b> {{ ub }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-0"><b>Status:</b> {{ node.status.value }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="mb-0"><b>Weight:</b> {{ weight }}</p>
+        </div>
+      </div>
+    </div>
+    <table class="table mb-0">
+      <colgroup>
+        <col style="width: 30%;"> <!-- Adjust the width as needed for the Items column -->
+        <col style="width: 70%;"> <!-- Adjust the width as needed for the x column -->
+      </colgroup>
+      <thead>
+        <tr>
+          <th scope="col">Items</th>
+          <th scope="col">x</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for value in node.relaxed_solution.selection %}
+        <tr
+          {% if node.branching_decisions[loop.index-1] == value %}
+          class="table-secondary"
+          {% elif 0 < value < 1 %}
+          class="table-warning"
+          {% endif %}>
+          <th scope="row">Item {{ loop.index-1 }}</th>
+          <td>{{ value | round(3) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <!-- Solutions found during search-->
+    {% if current_heuristic %}
+    <h5 class="card-title mt-3">Heuristic Solutions</h5>
+    <ul class="list-group">
+    <li class="list-group-item">
+      Found solution via heuristic: {{ current_heuristic }}; Value: {{ current_heuristic.value() }}
+    </li>
+    </ul>
+    {% endif %}
+  </div>
+</div>
+

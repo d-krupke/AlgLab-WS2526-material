@@ -1,0 +1,10 @@
+<dl class="row mb-0">
+  <dt class="col-sm-5 text-muted">Iterations</dt>
+  <dd class="col-sm-7 fw-semibold">{{ num_iterations }}</dd>
+
+  <dt class="col-sm-5 text-muted">Total Value</dt>
+  <dd class="col-sm-7 fw-semibold">{{ best_solution.value() }}</dd>
+
+  <dt class="col-sm-5 text-muted">Total Weight</dt>
+  <dd class="col-sm-7 fw-semibold">{{ best_solution.weight() }} / {{ instance.capacity }}  ({{ best_solution.weight() / instance.capacity * 100 | round(2)}}%)</dd>
+</dl>

@@ -94,7 +94,6 @@ CP-SAT, our hardware choices were also influenced by their recommendations.
 
 ## Example
 
-
 Before we dive into any internals, let us take a quick look at a simple
 application of CP-SAT. This example is so simple that you could solve it by
 hand, but know that CP-SAT would (probably) be fine with you adding a thousand
@@ -522,7 +521,7 @@ meant for two different weeks):
 1. [Exercise: Foobar](./exercises/00_foobar/) A simple exercise to get familiar
    with our workflow.
 2. [Exercise: Scalene](./exercises/01_profiling_exercise/) Learn about profiling
-   and networkx by fixing the worst code I have every written!
+   and networkx by fixing the worst code I have ever written!
 
 ### Part B:
 

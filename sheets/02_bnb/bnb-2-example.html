@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>(2) Branch & Bound Visualization</title>
+    <!-- Core styling -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+
+    <link rel="stylesheet" href="./knapsack_bnb/static/bnb.css" />
+  </head>
+
+  <body>
+    <div class="container mt-4">
+      <h1>Branch & Bound Visualization (Instance 2)</h1>
+      <p class="text-muted">
+        This page visualizes the branch and bound algorithm for the 0/1 knapsack problem. The tree is constructed using
+        D3.js and the slider allows you to see the progress of the algorithm.
+      </p>
+      
+
+      <div class="split-container gap-1 my-3" data-panel-divider="#slider-solution-details-divider">
+        <div class="panel-left px-0">
+          <div class="split-container gap-0 mb-1">
+            <div class="panel-left px-0" style="flex-basis: 50%;">
+              <div class="card">
+                <h4 class="card-header">
+                  Iteration Slider&nbsp;
+                  <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                    <i
+                      class="bi bi-eye-fill eye-icon js-eye-icon"
+                      role="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#iteration-slider-text"
+                      aria-expanded="true"
+                      aria-controls="iteration-slider-text"
+                    ></i>
+                  </span>
+                </h4>
+                <div class="card-body py-1">
+                  <div class="collapse show mt-2" id="iteration-slider-text">
+                    <div class="input-group d-flex justify-content-center mb-2 mx-auto">
+                      <button id="decrementButton" type="button" class="btn btn-outline-primary px-3 fs-5 fw-medium">
+                        -
+                      </button>
+                      <span
+                        id="sliderValue"
+                        class="form-control text-center fw-semibold fs-5"
+                        style="max-width: 60px"
+                        readonly
+                        >6</span
+                      >
+                      <button id="incrementButton" type="button" class="btn btn-outline-primary px-3 fs-5 fw-medium">
+                        +
+                      </button>
+                    </div>
+                    <input
+                      type="range"
+                      class="form-range"
+                      id="indexSlider"
+                      min="0"
+                      max="6"
+                      value="6"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          <div class="panel-divider"></div>
+
+          <div class="panel-right px-0 d-flex">
+            <div class="card flex-fill">
+              <h4 class="card-header">
+                Iteration Solution Details&nbsp;
+                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                  <i
+                    class="bi bi-eye-fill eye-icon js-eye-icon"
+                    role="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#iteration-solution-details"
+                    aria-expanded="true"
+                    aria-controls="iteration-solutions-details"
+                  ></i>
+                </span>
+              </h4>
+              <div class="card-body p-0">
+                <div class="collapse show" id="iteration-solution-details">Here come iteration solution details</div>
+              </div>
+            </div>
+          </div>
+          </div>  
+            <div class="card">
+              <div class="graph-container">
+                <svg id="bnb-graph"></svg>
+              </div>
+            </div>
+          </div>
+
+        <div class="panel-divider px-0" id="slider-solution-details-divider"></div>
+
+        <div class="panel-right px-0">
+          <div class="card">
+            <h4 class="card-header">
+              Iteration Information&nbsp;(Capacity: <b>20</b>)&nbsp;
+              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                <i
+                  class="bi bi-eye-fill eye-icon js-eye-icon"
+                  role="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#iteration-info"
+                  aria-expanded="true"
+                  aria-controls="iteration-info"
+                ></i>
+              </span>
+            </h4>
+            <div class="card-body p-0">
+              <div class="collapse show" id="iteration-info"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="split-container gap-1">
+        <div class="panel-left px-0">
+          <div class="card">
+            <h4 class="card-header">
+              Instance Information&nbsp;(Capacity: <b>20</b>)&nbsp;
+              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                <i
+                  class="bi bi-eye-fill eye-icon js-eye-icon"
+                  role="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#instance-card-text"
+                  aria-expanded="true"
+                  aria-controls="instance-card-text"
+                ></i>
+              </span>
+            </h4>
+            <div class="card-body">
+              <div class="collapse show" id="instance-card-text"><div class="table-responsive mx-auto" style="max-width: 600px">
+  <table class="table table-sm table-hover" id="instance-table">
+    <thead class="table-light">
+      <tr>
+        <th scope="col" class="right-border-cell">Item</th>
+        <th scope="col">Value</th>
+        <th scope="col">Weight</th>
+        <th scope="col" class="right-border-cell" data-sort-reverse>
+          <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">
+            <mfrac class="fw-bold fs-5">
+              <mrow>
+                <mtext>Value</mtext>
+              </mrow>
+              <mrow>
+                <mtext>Weight</mtext>
+              </mrow>
+            </mfrac>
+          </math>
+        </th>
+        <th scope="col" data-sort-reverse data-sort-default>Final Solution</th>
+      </tr>
+    </thead>
+    <tbody>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">0</th>
+        <td>10</td>
+        <td>1</td>
+        <td class="right-border-cell">10.0</td>
+        
+        <td data-sort="10.0" class="text-success">1</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">1</th>
+        <td>10</td>
+        <td>2</td>
+        <td class="right-border-cell">5.0</td>
+        
+        <td data-sort="5.0" class="text-success">1</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">2</th>
+        <td>10</td>
+        <td>3</td>
+        <td class="right-border-cell">3.33</td>
+        
+        <td data-sort="3.33" class="text-success">1</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">3</th>
+        <td>10</td>
+        <td>4</td>
+        <td class="right-border-cell">2.5</td>
+        
+        <td data-sort="-0.4" class="text-danger">0</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">4</th>
+        <td>10</td>
+        <td>5</td>
+        <td class="right-border-cell">2.0</td>
+        
+        <td data-sort="-0.5" class="text-danger">0</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">5</th>
+        <td>10</td>
+        <td>6</td>
+        <td class="right-border-cell">1.67</td>
+        
+        <td data-sort="-0.5988023952095809" class="text-danger">0</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">6</th>
+        <td>10</td>
+        <td>7</td>
+        <td class="right-border-cell">1.43</td>
+        
+        <td data-sort="-0.6993006993006994" class="text-danger">0</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">7</th>
+        <td>10</td>
+        <td>8</td>
+        <td class="right-border-cell">1.25</td>
+        
+        <td data-sort="-0.8" class="text-danger">0</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">8</th>
+        <td>10</td>
+        <td>9</td>
+        <td class="right-border-cell">1.11</td>
+        
+        <td data-sort="-0.9009009009009008" class="text-danger">0</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">9</th>
+        <td>10</td>
+        <td>10</td>
+        <td class="right-border-cell">1.0</td>
+        
+        <td data-sort="-1.0" class="text-danger">0</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">10</th>
+        <td>20</td>
+        <td>11</td>
+        <td class="right-border-cell">1.82</td>
+        
+        <td data-sort="-0.5494505494505494" class="text-danger">0</td>
+        
+      </tr>
+        
+      <tr>
+        <th scope="row" class="right-border-cell">11</th>
+        <td>30</td>
+        <td>12</td>
+        <td class="right-border-cell">2.5</td>
+        
+        <td data-sort="2.5" class="text-success">1</td>
+        
+      </tr>
+      
+    </tbody>
+  </table>
+</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-divider"></div>
+
+        <div class="panel-right px-0 d-flex flex-column">
+          <div class="card">
+            <h4 class="card-header">
+              Final Solution&nbsp;
+              <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                <i
+                  class="bi bi-eye-fill eye-icon js-eye-icon"
+                  role="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#solution-card-text"
+                  aria-expanded="true"
+                  aria-controls="solution-card-text"
+                ></i>
+              </span>
+            </h4>
+            <div class="card-body">
+              <div class="collapse show" id="solution-card-text"><dl class="row mb-0">
+  <dt class="col-sm-5 text-muted">Iterations</dt>
+  <dd class="col-sm-7 fw-semibold">6</dd>
+
+  <dt class="col-sm-5 text-muted">Total Value</dt>
+  <dd class="col-sm-7 fw-semibold">60</dd>
+
+  <dt class="col-sm-5 text-muted">Total Weight</dt>
+  <dd class="col-sm-7 fw-semibold">18 / 20  (90.0%)</dd>
+</dl></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="card my-3" id="node-details">Click on a node to see details here.</div> -->
+    </div>
+
+    <script src="https://unpkg.com/tablesort@latest/dist/tablesort.min.js"></script>
+    <script src="https://unpkg.com/tablesort@latest/dist/sorts/tablesort.number.min.js"></script>
+    <script id="bnb-data">
+      const BNB_DATA = {
+        "treeData": {"node_id":0,"lb":40.0,"ub":65.0,"created_at":0,"processed_at":0,"label":"65.0","color":"#adb5bd","children":[{"node_id":1,"lb":null,"ub":null,"created_at":0,"processed_at":null,"label":"59.1","color":"#adb5bd","children":[]},{"node_id":2,"lb":60.0,"ub":64.0,"created_at":0,"processed_at":1,"label":"65.0","color":"#adb5bd","children":[{"node_id":3,"lb":60.0,"ub":63.333333333333336,"created_at":1,"processed_at":2,"label":"64.0","color":"#adb5bd","children":[{"node_id":5,"lb":60.0,"ub":62.857142857142854,"created_at":2,"processed_at":4,"label":"63.3","color":"#adb5bd","children":[{"node_id":9,"lb":60.0,"ub":62.5,"created_at":4,"processed_at":5,"label":"62.9","color":"#adb5bd","children":[{"node_id":11,"lb":60.0,"ub":60.0,"created_at":5,"processed_at":6,"label":"62.5","color":"#adb5bd","children":[{"node_id":13,"lb":null,"ub":null,"created_at":6,"processed_at":null,"label":"60.0","color":"#20c997","children":[]},{"node_id":14,"lb":null,"ub":null,"created_at":6,"processed_at":null,"label":"40.0","color":"#20c997","children":[]}]},{"node_id":12,"lb":null,"ub":null,"created_at":5,"processed_at":null,"label":"50.0","color":"#20c997","children":[]}]},{"node_id":10,"lb":null,"ub":null,"created_at":4,"processed_at":null,"label":"55.0","color":"#adb5bd","children":[]}]},{"node_id":6,"lb":null,"ub":null,"created_at":2,"processed_at":null,"label":"60.0","color":"#20c997","children":[]}]},{"node_id":4,"lb":60.0,"ub":63.333333333333336,"created_at":1,"processed_at":3,"label":"63.3","color":"#adb5bd","children":[{"node_id":7,"lb":null,"ub":null,"created_at":3,"processed_at":null,"label":"60.0","color":"#20c997","children":[]},{"node_id":8,"lb":null,"ub":null,"created_at":3,"processed_at":null,"label":"60.0","color":"#20c997","children":[]}]}]}]},
+        "node_tooltips": {0: '<div class="row text-start">\n  <dt class="col-sm-6"><i class="bi bi-arrow-clockwise"></i> Iteration:</dt>\n  <dd class="col-sm-6">0</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-arrow-up"></i> Upper Bound:</dt>\n  <dd class="col-sm-6">65.0</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-arrow-down"></i> Lower Bound:</dt>\n  <dd class="col-sm-6">40</dd>\n  \n\n  <dt class="col-sm-6"><i class="bi bi-arrow-down-circle"></i> Global LB:</dt>\n  <dd class="col-sm-6">40</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-info-circle-fill"></i> Status:</dt>\n  <dd class="col-sm-6">Branched</dd>\n\n   \n</div>', 2: '<div class="row text-start">\n  <dt class="col-sm-6"><i class="bi bi-arrow-clockwise"></i> Iteration:</dt>\n  <dd class="col-sm-6">1</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-arrow-up"></i> Upper Bound:</dt>\n  <dd class="col-sm-6">65.0</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-arrow-down"></i> Lower Bound:</dt>\n  <dd class="col-sm-6">60</dd>\n  \n\n  <dt class="col-sm-6"><i class="bi bi-arrow-down-circle"></i> Global LB:</dt>\n  <dd class="col-sm-6">60</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-info-circle-fill"></i> Status:</dt>\n  <dd class="col-sm-6">Branched</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-check-circle-fill text-success"></i> Enforced Items:</dt>\n  <dd class="col-sm-6"> 11 </dd>\n  <dt class="col-sm-6">&nbsp;&nbsp;<i class="bi bi-basket-fill text-success"></i> Enforced Weight:</dt>\n  <dd class="col-sm-6">12</dd>\n   \n</div>', 3: '<div class="row text-start">\n  <dt class="col-sm-6"><i class="bi bi-arrow-clockwise"></i> Iteration:</dt>\n  <dd class="col-sm-6">2</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-arrow-up"></i> Upper Bound:</dt>\n  <dd class="col-sm-6">64.0</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-arrow-down"></i> Lower Bound:</dt>\n  <dd class="col-sm-6">60</dd>\n  \n\n  <dt class="col-sm-6"><i class="bi bi-arrow-down-circle"></i> Global LB:</dt>\n  <dd class="col-sm-6">60</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-info-circle-fill"></i> Status:</dt>\n  <dd class="col-sm-6">Branched</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-check-circle-fill text-success"></i> Enforced Items:</dt>\n  <dd class="col-sm-6"> 11 </dd>\n  <dt class="col-sm-6">&nbsp;&nbsp;<i class="bi bi-basket-fill text-success"></i> Enforced Weight:</dt>\n  <dd class="col-sm-6">12</dd>\n   \n  <dt class="col-sm-6"><i class="bi bi-x-circle-fill text-danger"></i> Prohibited Items:</dt>\n  <dd class="col-sm-6"> 3 </dd>\n  \n</div>', 4: '<div class="row text-start">\n  <dt class="col-sm-6"><i class="bi bi-arrow-clockwise"></i> Iteration:</dt>\n  <dd class="col-sm-6">3</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-arrow-up"></i> Upper Bound:</dt>\n  <dd class="col-sm-6">63.33</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-arrow-down"></i> Lower Bound:</dt>\n  <dd class="col-sm-6">60</dd>\n  \n\n  <dt class="col-sm-6"><i class="bi bi-arrow-down-circle"></i> Global LB:</dt>\n  <dd class="col-sm-6">60</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-info-circle-fill"></i> Status:</dt>\n  <dd class="col-sm-6">Branched</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-check-circle-fill text-success"></i> Enforced Items:</dt>\n  <dd class="col-sm-6"> 3,   11 </dd>\n  <dt class="col-sm-6">&nbsp;&nbsp;<i class="bi bi-basket-fill text-success"></i> Enforced Weight:</dt>\n  <dd class="col-sm-6">16</dd>\n   \n</div>', 5: '<div class="row text-start">\n  <dt class="col-sm-6"><i class="bi bi-arrow-clockwise"></i> Iteration:</dt>\n  <dd class="col-sm-6">4</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-arrow-up"></i> Upper Bound:</dt>\n  <dd class="col-sm-6">63.33</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-arrow-down"></i> Lower Bound:</dt>\n  <dd class="col-sm-6">60</dd>\n  \n\n  <dt class="col-sm-6"><i class="bi bi-arrow-down-circle"></i> Global LB:</dt>\n  <dd class="col-sm-6">60</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-info-circle-fill"></i> Status:</dt>\n  <dd class="col-sm-6">Branched</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-check-circle-fill text-success"></i> Enforced Items:</dt>\n  <dd class="col-sm-6"> 11 </dd>\n  <dt class="col-sm-6">&nbsp;&nbsp;<i class="bi bi-basket-fill text-success"></i> Enforced Weight:</dt>\n  <dd class="col-sm-6">12</dd>\n   \n  <dt class="col-sm-6"><i class="bi bi-x-circle-fill text-danger"></i> Prohibited Items:</dt>\n  <dd class="col-sm-6"> 3,   4 </dd>\n  \n</div>', 9: '<div class="row text-start">\n  <dt class="col-sm-6"><i class="bi bi-arrow-clockwise"></i> Iteration:</dt>\n  <dd class="col-sm-6">5</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-arrow-up"></i> Upper Bound:</dt>\n  <dd class="col-sm-6">62.86</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-arrow-down"></i> Lower Bound:</dt>\n  <dd class="col-sm-6">60</dd>\n  \n\n  <dt class="col-sm-6"><i class="bi bi-arrow-down-circle"></i> Global LB:</dt>\n  <dd class="col-sm-6">60</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-info-circle-fill"></i> Status:</dt>\n  <dd class="col-sm-6">Branched</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-check-circle-fill text-success"></i> Enforced Items:</dt>\n  <dd class="col-sm-6"> 11 </dd>\n  <dt class="col-sm-6">&nbsp;&nbsp;<i class="bi bi-basket-fill text-success"></i> Enforced Weight:</dt>\n  <dd class="col-sm-6">12</dd>\n   \n  <dt class="col-sm-6"><i class="bi bi-x-circle-fill text-danger"></i> Prohibited Items:</dt>\n  <dd class="col-sm-6"> 3,   4,   5 </dd>\n  \n</div>', 11: '<div class="row text-start">\n  <dt class="col-sm-6"><i class="bi bi-arrow-clockwise"></i> Iteration:</dt>\n  <dd class="col-sm-6">6</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-arrow-up"></i> Upper Bound:</dt>\n  <dd class="col-sm-6">62.5</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-arrow-down"></i> Lower Bound:</dt>\n  <dd class="col-sm-6">60</dd>\n  \n\n  <dt class="col-sm-6"><i class="bi bi-arrow-down-circle"></i> Global LB:</dt>\n  <dd class="col-sm-6">60</dd>\n\n  <dt class="col-sm-6"><i class="bi bi-info-circle-fill"></i> Status:</dt>\n  <dd class="col-sm-6">Branched</dd>\n\n  \n  <dt class="col-sm-6"><i class="bi bi-check-circle-fill text-success"></i> Enforced Items:</dt>\n  <dd class="col-sm-6"> 11 </dd>\n  <dt class="col-sm-6">&nbsp;&nbsp;<i class="bi bi-basket-fill text-success"></i> Enforced Weight:</dt>\n  <dd class="col-sm-6">12</dd>\n   \n  <dt class="col-sm-6"><i class="bi bi-x-circle-fill text-danger"></i> Prohibited Items:</dt>\n  <dd class="col-sm-6"> 3,   4,   5,   6 </dd>\n  \n</div>'},
+        "iteration_info": {0: '\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="pe-3 right-border-cell">i</th>\n        <th scope="col" class="ps-2">Value</th>\n        <th scope="col">Weight</th>\n        <th scope="col" class="right-border-cell" data-sort-reverse data-sort-default>\n          <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">\n            <mfrac class="fw-bold fs-5">\n              <mrow>\n                <mtext>Value</mtext>\n              </mrow>\n              <mrow>\n                <mtext>Weight</mtext>\n              </mrow>\n            </mfrac>\n          </math>\n        </th>\n        <th scope="col" data-sort-reverse>Heuristic</th>\n        <th scope="col" data-sort-reverse>Best Heu</th>\n        <th scope="col" data-sort-reverse>Relaxed</th>\n      </tr>\n    </thead>\n    <tbody>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">0</th>\n        <td>10</td>\n        <td>1</td>\n        <td class="right-border-cell">10.0</td>\n         \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">1</th>\n        <td>10</td>\n        <td>2</td>\n        <td class="right-border-cell">5.0</td>\n         \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">2</th>\n        <td>10</td>\n        <td>3</td>\n        <td class="right-border-cell">3.33</td>\n         \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">3</th>\n        <td>10</td>\n        <td>4</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">4</th>\n        <td>10</td>\n        <td>5</td>\n        <td class="right-border-cell">2.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">5</th>\n        <td>10</td>\n        <td>6</td>\n        <td class="right-border-cell">1.67</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">6</th>\n        <td>10</td>\n        <td>7</td>\n        <td class="right-border-cell">1.43</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">7</th>\n        <td>10</td>\n        <td>8</td>\n        <td class="right-border-cell">1.25</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">8</th>\n        <td>10</td>\n        <td>9</td>\n        <td class="right-border-cell">1.11</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">9</th>\n        <td>10</td>\n        <td>10</td>\n        <td class="right-border-cell">1.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">10</th>\n        <td>20</td>\n        <td>11</td>\n        <td class="right-border-cell">1.82</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">11</th>\n        <td>30</td>\n        <td>12</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="2.0833333333333335"\n  class="text-warning-emphasis"\n>\n  0.83\n</td>\n\n      </tr>\n      \n    </tbody>\n  </table>\n</div>', 2: '\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="pe-3 right-border-cell">i</th>\n        <th scope="col" class="ps-2">Value</th>\n        <th scope="col">Weight</th>\n        <th scope="col" class="right-border-cell" data-sort-reverse data-sort-default>\n          <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">\n            <mfrac class="fw-bold fs-5">\n              <mrow>\n                <mtext>Value</mtext>\n              </mrow>\n              <mrow>\n                <mtext>Weight</mtext>\n              </mrow>\n            </mfrac>\n          </math>\n        </th>\n        <th scope="col" data-sort-reverse>Heuristic</th>\n        <th scope="col" data-sort-reverse>Best Heu</th>\n        <th scope="col" data-sort-reverse>Relaxed</th>\n      </tr>\n    </thead>\n    <tbody>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">0</th>\n        <td>10</td>\n        <td>1</td>\n        <td class="right-border-cell">10.0</td>\n         \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">1</th>\n        <td>10</td>\n        <td>2</td>\n        <td class="right-border-cell">5.0</td>\n         \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">2</th>\n        <td>10</td>\n        <td>3</td>\n        <td class="right-border-cell">3.33</td>\n         \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">3</th>\n        <td>10</td>\n        <td>4</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="1.25"\n  class="text-warning-emphasis"\n>\n  0.5\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">4</th>\n        <td>10</td>\n        <td>5</td>\n        <td class="right-border-cell">2.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">5</th>\n        <td>10</td>\n        <td>6</td>\n        <td class="right-border-cell">1.67</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">6</th>\n        <td>10</td>\n        <td>7</td>\n        <td class="right-border-cell">1.43</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">7</th>\n        <td>10</td>\n        <td>8</td>\n        <td class="right-border-cell">1.25</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">8</th>\n        <td>10</td>\n        <td>9</td>\n        <td class="right-border-cell">1.11</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">9</th>\n        <td>10</td>\n        <td>10</td>\n        <td class="right-border-cell">1.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">10</th>\n        <td>20</td>\n        <td>11</td>\n        <td class="right-border-cell">1.82</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">11</th>\n        <td>30</td>\n        <td>12</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n      \n    </tbody>\n  </table>\n</div>', 3: '\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="pe-3 right-border-cell">i</th>\n        <th scope="col" class="ps-2">Value</th>\n        <th scope="col">Weight</th>\n        <th scope="col" class="right-border-cell" data-sort-reverse data-sort-default>\n          <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">\n            <mfrac class="fw-bold fs-5">\n              <mrow>\n                <mtext>Value</mtext>\n              </mrow>\n              <mrow>\n                <mtext>Weight</mtext>\n              </mrow>\n            </mfrac>\n          </math>\n        </th>\n        <th scope="col" data-sort-reverse>Heuristic</th>\n        <th scope="col" data-sort-reverse>Best Heu</th>\n        <th scope="col" data-sort-reverse>Relaxed</th>\n      </tr>\n    </thead>\n    <tbody>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">0</th>\n        <td>10</td>\n        <td>1</td>\n        <td class="right-border-cell">10.0</td>\n         \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">1</th>\n        <td>10</td>\n        <td>2</td>\n        <td class="right-border-cell">5.0</td>\n         \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">2</th>\n        <td>10</td>\n        <td>3</td>\n        <td class="right-border-cell">3.33</td>\n         \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">3</th>\n        <td>10</td>\n        <td>4</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">4</th>\n        <td>10</td>\n        <td>5</td>\n        <td class="right-border-cell">2.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.8"\n  class="text-warning-emphasis"\n>\n  0.4\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">5</th>\n        <td>10</td>\n        <td>6</td>\n        <td class="right-border-cell">1.67</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">6</th>\n        <td>10</td>\n        <td>7</td>\n        <td class="right-border-cell">1.43</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">7</th>\n        <td>10</td>\n        <td>8</td>\n        <td class="right-border-cell">1.25</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">8</th>\n        <td>10</td>\n        <td>9</td>\n        <td class="right-border-cell">1.11</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">9</th>\n        <td>10</td>\n        <td>10</td>\n        <td class="right-border-cell">1.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">10</th>\n        <td>20</td>\n        <td>11</td>\n        <td class="right-border-cell">1.82</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">11</th>\n        <td>30</td>\n        <td>12</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n      \n    </tbody>\n  </table>\n</div>', 4: '\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="pe-3 right-border-cell">i</th>\n        <th scope="col" class="ps-2">Value</th>\n        <th scope="col">Weight</th>\n        <th scope="col" class="right-border-cell" data-sort-reverse data-sort-default>\n          <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">\n            <mfrac class="fw-bold fs-5">\n              <mrow>\n                <mtext>Value</mtext>\n              </mrow>\n              <mrow>\n                <mtext>Weight</mtext>\n              </mrow>\n            </mfrac>\n          </math>\n        </th>\n        <th scope="col" data-sort-reverse>Heuristic</th>\n        <th scope="col" data-sort-reverse>Best Heu</th>\n        <th scope="col" data-sort-reverse>Relaxed</th>\n      </tr>\n    </thead>\n    <tbody>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">0</th>\n        <td>10</td>\n        <td>1</td>\n        <td class="right-border-cell">10.0</td>\n         \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">1</th>\n        <td>10</td>\n        <td>2</td>\n        <td class="right-border-cell">5.0</td>\n         \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">2</th>\n        <td>10</td>\n        <td>3</td>\n        <td class="right-border-cell">3.33</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="1.1099999999999999"\n  class="text-warning-emphasis"\n>\n  0.33\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">3</th>\n        <td>10</td>\n        <td>4</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">4</th>\n        <td>10</td>\n        <td>5</td>\n        <td class="right-border-cell">2.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">5</th>\n        <td>10</td>\n        <td>6</td>\n        <td class="right-border-cell">1.67</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">6</th>\n        <td>10</td>\n        <td>7</td>\n        <td class="right-border-cell">1.43</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">7</th>\n        <td>10</td>\n        <td>8</td>\n        <td class="right-border-cell">1.25</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">8</th>\n        <td>10</td>\n        <td>9</td>\n        <td class="right-border-cell">1.11</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">9</th>\n        <td>10</td>\n        <td>10</td>\n        <td class="right-border-cell">1.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">10</th>\n        <td>20</td>\n        <td>11</td>\n        <td class="right-border-cell">1.82</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">11</th>\n        <td>30</td>\n        <td>12</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n      \n    </tbody>\n  </table>\n</div>', 5: '\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="pe-3 right-border-cell">i</th>\n        <th scope="col" class="ps-2">Value</th>\n        <th scope="col">Weight</th>\n        <th scope="col" class="right-border-cell" data-sort-reverse data-sort-default>\n          <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">\n            <mfrac class="fw-bold fs-5">\n              <mrow>\n                <mtext>Value</mtext>\n              </mrow>\n              <mrow>\n                <mtext>Weight</mtext>\n              </mrow>\n            </mfrac>\n          </math>\n        </th>\n        <th scope="col" data-sort-reverse>Heuristic</th>\n        <th scope="col" data-sort-reverse>Best Heu</th>\n        <th scope="col" data-sort-reverse>Relaxed</th>\n      </tr>\n    </thead>\n    <tbody>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">0</th>\n        <td>10</td>\n        <td>1</td>\n        <td class="right-border-cell">10.0</td>\n         \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">1</th>\n        <td>10</td>\n        <td>2</td>\n        <td class="right-border-cell">5.0</td>\n         \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">2</th>\n        <td>10</td>\n        <td>3</td>\n        <td class="right-border-cell">3.33</td>\n         \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">3</th>\n        <td>10</td>\n        <td>4</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">4</th>\n        <td>10</td>\n        <td>5</td>\n        <td class="right-border-cell">2.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">5</th>\n        <td>10</td>\n        <td>6</td>\n        <td class="right-border-cell">1.67</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.5566666666666666"\n  class="text-warning-emphasis"\n>\n  0.33\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">6</th>\n        <td>10</td>\n        <td>7</td>\n        <td class="right-border-cell">1.43</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">7</th>\n        <td>10</td>\n        <td>8</td>\n        <td class="right-border-cell">1.25</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">8</th>\n        <td>10</td>\n        <td>9</td>\n        <td class="right-border-cell">1.11</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">9</th>\n        <td>10</td>\n        <td>10</td>\n        <td class="right-border-cell">1.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">10</th>\n        <td>20</td>\n        <td>11</td>\n        <td class="right-border-cell">1.82</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">11</th>\n        <td>30</td>\n        <td>12</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n      \n    </tbody>\n  </table>\n</div>', 9: '\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="pe-3 right-border-cell">i</th>\n        <th scope="col" class="ps-2">Value</th>\n        <th scope="col">Weight</th>\n        <th scope="col" class="right-border-cell" data-sort-reverse data-sort-default>\n          <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">\n            <mfrac class="fw-bold fs-5">\n              <mrow>\n                <mtext>Value</mtext>\n              </mrow>\n              <mrow>\n                <mtext>Weight</mtext>\n              </mrow>\n            </mfrac>\n          </math>\n        </th>\n        <th scope="col" data-sort-reverse>Heuristic</th>\n        <th scope="col" data-sort-reverse>Best Heu</th>\n        <th scope="col" data-sort-reverse>Relaxed</th>\n      </tr>\n    </thead>\n    <tbody>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">0</th>\n        <td>10</td>\n        <td>1</td>\n        <td class="right-border-cell">10.0</td>\n         \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">1</th>\n        <td>10</td>\n        <td>2</td>\n        <td class="right-border-cell">5.0</td>\n         \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">2</th>\n        <td>10</td>\n        <td>3</td>\n        <td class="right-border-cell">3.33</td>\n         \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">3</th>\n        <td>10</td>\n        <td>4</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">4</th>\n        <td>10</td>\n        <td>5</td>\n        <td class="right-border-cell">2.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">5</th>\n        <td>10</td>\n        <td>6</td>\n        <td class="right-border-cell">1.67</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">6</th>\n        <td>10</td>\n        <td>7</td>\n        <td class="right-border-cell">1.43</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.40857142857142853"\n  class="text-warning-emphasis"\n>\n  0.29\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">7</th>\n        <td>10</td>\n        <td>8</td>\n        <td class="right-border-cell">1.25</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">8</th>\n        <td>10</td>\n        <td>9</td>\n        <td class="right-border-cell">1.11</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">9</th>\n        <td>10</td>\n        <td>10</td>\n        <td class="right-border-cell">1.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">10</th>\n        <td>20</td>\n        <td>11</td>\n        <td class="right-border-cell">1.82</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">11</th>\n        <td>30</td>\n        <td>12</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n      \n    </tbody>\n  </table>\n</div>', 11: '\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="pe-3 right-border-cell">i</th>\n        <th scope="col" class="ps-2">Value</th>\n        <th scope="col">Weight</th>\n        <th scope="col" class="right-border-cell" data-sort-reverse data-sort-default>\n          <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML">\n            <mfrac class="fw-bold fs-5">\n              <mrow>\n                <mtext>Value</mtext>\n              </mrow>\n              <mrow>\n                <mtext>Weight</mtext>\n              </mrow>\n            </mfrac>\n          </math>\n        </th>\n        <th scope="col" data-sort-reverse>Heuristic</th>\n        <th scope="col" data-sort-reverse>Best Heu</th>\n        <th scope="col" data-sort-reverse>Relaxed</th>\n      </tr>\n    </thead>\n    <tbody>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">0</th>\n        <td>10</td>\n        <td>1</td>\n        <td class="right-border-cell">10.0</td>\n         \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="10.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">1</th>\n        <td>10</td>\n        <td>2</td>\n        <td class="right-border-cell">5.0</td>\n         \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="5.0"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">2</th>\n        <td>10</td>\n        <td>3</td>\n        <td class="right-border-cell">3.33</td>\n         \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="3.33"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">3</th>\n        <td>10</td>\n        <td>4</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">4</th>\n        <td>10</td>\n        <td>5</td>\n        <td class="right-border-cell">2.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">5</th>\n        <td>10</td>\n        <td>6</td>\n        <td class="right-border-cell">1.67</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">6</th>\n        <td>10</td>\n        <td>7</td>\n        <td class="right-border-cell">1.43</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">7</th>\n        <td>10</td>\n        <td>8</td>\n        <td class="right-border-cell">1.25</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.3125"\n  class="text-warning-emphasis"\n>\n  0.25\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">8</th>\n        <td>10</td>\n        <td>9</td>\n        <td class="right-border-cell">1.11</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">9</th>\n        <td>10</td>\n        <td>10</td>\n        <td class="right-border-cell">1.0</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">10</th>\n        <td>20</td>\n        <td>11</td>\n        <td class="right-border-cell">1.82</td>\n         \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0\n</td>\n  \n\n<td\n  data-sort="0.0"\n  class="text-danger"\n>\n  0.0\n</td>\n\n      </tr>\n        \n      <tr>\n        <th scope="row" class="right-border-cell">11</th>\n        <td>30</td>\n        <td>12</td>\n        <td class="right-border-cell">2.5</td>\n         \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1\n</td>\n  \n\n<td\n  data-sort="2.5"\n  class="text-success"\n>\n  1.0\n</td>\n\n      </tr>\n      \n    </tbody>\n  </table>\n</div>'},
+        "iteration_solution_details": {0: '\n\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-solutions-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="right-border-cell"></th>\n        <th scope="col">Heuristic</th>\n        <th scope="col">Best Heuristic</th>\n        <th scope="col">Relaxed</th>\n      </tr>\n    </thead>\n    <tbody class="table-group-divider">\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Value</th>\n        <td>\n  \n    40\n  \n</td>\n        <td>\n  \n    40\n  \n</td>\n        <td>\n  \n    65.0\n  \n</td>\n      </tr>\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Weight</th>\n        <td>\n  \n    10\n  \n</td>\n        <td>\n  \n    10\n  \n</td>\n        <td>\n  \n    20.0\n  \n</td>\n      </tr>\n    </tbody>\n  </table>\n</div>', 2: '\n\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-solutions-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="right-border-cell"></th>\n        <th scope="col">Heuristic</th>\n        <th scope="col">Best Heuristic</th>\n        <th scope="col">Relaxed</th>\n      </tr>\n    </thead>\n    <tbody class="table-group-divider">\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Value</th>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    65.0\n  \n</td>\n      </tr>\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Weight</th>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    20.0\n  \n</td>\n      </tr>\n    </tbody>\n  </table>\n</div>', 3: '\n\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-solutions-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="right-border-cell"></th>\n        <th scope="col">Heuristic</th>\n        <th scope="col">Best Heuristic</th>\n        <th scope="col">Relaxed</th>\n      </tr>\n    </thead>\n    <tbody class="table-group-divider">\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Value</th>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    64.0\n  \n</td>\n      </tr>\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Weight</th>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    20.0\n  \n</td>\n      </tr>\n    </tbody>\n  </table>\n</div>', 4: '\n\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-solutions-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="right-border-cell"></th>\n        <th scope="col">Heuristic</th>\n        <th scope="col">Best Heuristic</th>\n        <th scope="col">Relaxed</th>\n      </tr>\n    </thead>\n    <tbody class="table-group-divider">\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Value</th>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    63.33\n  \n</td>\n      </tr>\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Weight</th>\n        <td>\n  \n    19\n  \n</td>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    20.0\n  \n</td>\n      </tr>\n    </tbody>\n  </table>\n</div>', 5: '\n\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-solutions-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="right-border-cell"></th>\n        <th scope="col">Heuristic</th>\n        <th scope="col">Best Heuristic</th>\n        <th scope="col">Relaxed</th>\n      </tr>\n    </thead>\n    <tbody class="table-group-divider">\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Value</th>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    63.33\n  \n</td>\n      </tr>\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Weight</th>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    20.0\n  \n</td>\n      </tr>\n    </tbody>\n  </table>\n</div>', 9: '\n\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-solutions-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="right-border-cell"></th>\n        <th scope="col">Heuristic</th>\n        <th scope="col">Best Heuristic</th>\n        <th scope="col">Relaxed</th>\n      </tr>\n    </thead>\n    <tbody class="table-group-divider">\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Value</th>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    62.86\n  \n</td>\n      </tr>\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Weight</th>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    20.0\n  \n</td>\n      </tr>\n    </tbody>\n  </table>\n</div>', 11: '\n\n\n<div class="table-responsive mx-auto" style="max-width: 600px">\n  <table class="table table-sm table-hover m-0" id="iteration-solutions-table">\n    <thead class="table-light">\n      <tr>\n        <th scope="col" class="right-border-cell"></th>\n        <th scope="col">Heuristic</th>\n        <th scope="col">Best Heuristic</th>\n        <th scope="col">Relaxed</th>\n      </tr>\n    </thead>\n    <tbody class="table-group-divider">\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Value</th>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    60\n  \n</td>\n        <td>\n  \n    62.5\n  \n</td>\n      </tr>\n      <tr>\n        <th scope="row" class="right-border-cell">&sum; Weight</th>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    18\n  \n</td>\n        <td>\n  \n    20.0\n  \n</td>\n      </tr>\n    </tbody>\n  </table>\n</div>'},
+        "iterations": [0, 2, 3, 4, 5, 9, 11]
+      }
+    </script>
+    <script src="./knapsack_bnb/static/bnb.js"></script>
+  </body>
+</html>

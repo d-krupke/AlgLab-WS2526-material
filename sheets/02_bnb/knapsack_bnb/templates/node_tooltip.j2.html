@@ -1,0 +1,49 @@
+<div class="row text-start">
+  {% if node.status.value == "Pruned"%}
+  <h5>Pruned node <small>(local ub &le; global lb)</small></h5>
+  <ul style="padding-inline-start: 2em;">
+    <li class="ms-4">{{node.relaxed_solution.value() | round(2)}} &le; {{lb}}</li>
+  </ul>
+  {% endif %}
+
+  <dt class="col-sm-6"><i class="bi bi-arrow-clockwise"></i> Iteration:</dt>
+  <dd class="col-sm-6">{{iteration}}</dd>
+
+  <dt class="col-sm-6"><i class="bi bi-arrow-up"></i> Upper Bound:</dt>
+  <dd class="col-sm-6">{{node.relaxed_solution.value() | round(2)}}</dd>
+
+  {% if current_heuristic %}
+  <dt class="col-sm-6"><i class="bi bi-arrow-down"></i> Lower Bound:</dt>
+  <dd class="col-sm-6">{{current_heuristic.value()}}</dd>
+  {% endif %}
+
+  <dt class="col-sm-6"><i class="bi bi-arrow-down-circle"></i> Global LB:</dt>
+  <dd class="col-sm-6">{{lb}}</dd>
+
+  <!-- <dt class="col-sm-6"><i class="bi bi-info-circle-fill"></i> Status:</dt> -->
+  <!-- <dd class="col-sm-6">{{node.status.value}}</dd> -->
+
+  {% if included_items %}
+  <dt class="col-sm-6"><i class="bi bi-check-circle-fill text-success"></i> Enforced Items:</dt>
+  <dd class="col-sm-6">
+    {% for item in included_items %} 
+      {{ item }}
+      {% if not loop.last %}, 
+      {% endif %} 
+    {% endfor %}
+  </dd>
+  <dt class="col-sm-6">&nbsp;&nbsp;<i class="bi bi-basket-fill text-success"></i> Enforced Weight:</dt>
+  <dd class="col-sm-6">{{included_weight}}</dd>
+  {% endif %} 
+
+  {% if excluded_items %}
+  <dt class="col-sm-6"><i class="bi bi-x-circle-fill text-danger"></i> Prohibited Items:</dt>
+  <dd class="col-sm-6">
+    {% for item in excluded_items %} 
+      {{item}}
+      {% if not loop.last %}, 
+      {% endif %} 
+    {% endfor %}
+  </dd>
+  {% endif %}
+</div>
