@@ -99,15 +99,59 @@ class MyRelaxationSolver(RelaxationSolver):
     Implement any relaxation (e.g., fractional knapsack, propagation) to tighten bounds.
     """
 
-    def solve(
-        self, instance: Instance, decisions: BranchingDecisions
-    ) -> RelaxedSolution:
-        # placeholder: behave like NaiveRelaxationSolver
+    def solve(self, instance: Instance, decisions: BranchingDecisions) -> RelaxedSolution:
+        
+        """ # placeholder: behave like NaiveRelaxationSolver
         used = sum(item.weight for item, x in zip(instance.items, decisions) if x == 1)
         if used > instance.capacity:
             return RelaxedSolution.create_infeasible(instance)
         selection = [0.0 if x == 0 else 1.0 for x in decisions]
         upper = sum(item.value * sel for item, sel in zip(instance.items, selection))
         return RelaxedSolution(instance, selection, upper)
+        """
 
+        used = sum(item.weight for item, x in zip(instance.items, decisions) if x == 1)
+        if used > instance.capacity:
+            return RelaxedSolution.create_infeasible(instance)
+        
+        def sort_by_ratio(item):
+            return item.value / item.weight
 
+        # frac knapsack
+        items_dict = {item: x for item, x in zip(instance.items, decisions)}
+        enforced_items = []
+        prohibited_items = []
+        unfixed_items = []
+
+        for item in instance.items:
+            match items_dict[item]:
+                case None:
+                    unfixed_items.append(item)
+                case 0:
+                    prohibited_items.append(item)
+                case 1:
+                    enforced_items.append(item)
+        
+        sorted_items = sorted(unfixed_items, key=sort_by_ratio, reverse=True)
+        weights_sum = 0
+        values_sum = sum(item.value for item in enforced_items)
+        end_reached = 0
+        adjusted_cap = instance.capacity - sum(item.weight for item in enforced_items)
+
+        for item in sorted_items:
+
+            if end_reached == 1:
+                items_dict[item] = 0.0
+                continue
+
+            if weights_sum + item.weight > adjusted_cap:
+                x = round((adjusted_cap - weights_sum) / item.weight, 2)
+                values_sum += x * item.value
+                items_dict[item] = x
+                end_reached = 1
+
+            values_sum += item.value
+            weights_sum += item.weight
+            items_dict[item] = 1.0
+
+        return RelaxedSolution(instance, items_dict.values(), values_sum)
