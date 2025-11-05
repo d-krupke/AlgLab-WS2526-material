@@ -101,15 +101,6 @@ class MyRelaxationSolver(RelaxationSolver):
 
     def solve(self, instance: Instance, decisions: BranchingDecisions) -> RelaxedSolution:
         
-        """ # placeholder: behave like NaiveRelaxationSolver
-        used = sum(item.weight for item, x in zip(instance.items, decisions) if x == 1)
-        if used > instance.capacity:
-            return RelaxedSolution.create_infeasible(instance)
-        selection = [0.0 if x == 0 else 1.0 for x in decisions]
-        upper = sum(item.value * sel for item, sel in zip(instance.items, selection))
-        return RelaxedSolution(instance, selection, upper)
-        """
-
         used = sum(item.weight for item, x in zip(instance.items, decisions) if x == 1)
         if used > instance.capacity:
             return RelaxedSolution.create_infeasible(instance)
@@ -138,7 +129,7 @@ class MyRelaxationSolver(RelaxationSolver):
         end_reached = 0
         enforced_weight = sum(item.weight for item in enforced_items)
         adjusted_cap = instance.capacity - enforced_weight
-        tmp_item = None
+
         for item in sorted_items:
 
             if end_reached == 1:
@@ -150,7 +141,6 @@ class MyRelaxationSolver(RelaxationSolver):
                     x = (adjusted_cap - weights_sum) / item.weight
                     values_sum += x * item.value
                     items_dict[item] = x
-                    # tmp_item = item
                     end_reached = 1
                 else:
                     items_dict[item] = 0.0
@@ -162,28 +152,4 @@ class MyRelaxationSolver(RelaxationSolver):
                 weights_sum += item.weight
                 items_dict[item] = 1.0
 
-        """ 
-        max_val = 0
-        idx = 0
-        skip = 1
-        for item in sorted_items:
-            if item == tmp_item:
-                skip = 0
-                continue
-            if skip == 1:
-                continue
-            
-            if (item.value / item.weight) > max_val and (item.weight <= adjusted_cap): 
-                
-                max_val = item.value / item.weight
-                idx = item
-
-        if (idx != 0):
-            values_sum -= items_dict[tmp_item] * tmp_item.value
-            items_dict[tmp_item] = 0.0
-
-            x = (adjusted_cap - weights_sum) / idx.weight
-            values_sum += x * idx.value
-            items_dict[idx] = x
-         """
         return RelaxedSolution(instance, items_dict.values(), values_sum)
