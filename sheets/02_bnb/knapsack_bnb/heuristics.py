@@ -72,7 +72,7 @@ class MyHeuristic(Heuristics):
         for i in range(len(adj_selection)):
             if int(adj_selection[i]) != adj_selection[i] and int(adj_selection[i]) != adj_selection[i]:
                 upper -= adj_selection[i] * instance.items[i].value
-                adj_selection[i] = 0
+                adj_selection[i] = 0.0
                 break
 
         best_value = 0
@@ -83,7 +83,7 @@ class MyHeuristic(Heuristics):
                 best_value = instance.items[i].value
 
         if best_idx != None:
-            adj_selection[best_idx] = 1
+            adj_selection[best_idx] = 1.0
             upper += instance.items[best_idx].value
 
 
