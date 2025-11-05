@@ -62,7 +62,7 @@ class MyBranchingStrategy(BranchingStrategy):
                 
 
         if node.heuristic_solution:
-
+            
             if node.heuristic_solution.upper_bound >= int(node.relaxed_solution.upper_bound):
                 return ()
             
@@ -80,18 +80,21 @@ class MyBranchingStrategy(BranchingStrategy):
                 return ()
             
              """
-        max_val = 0
-        idx = 0
-        for item_e, x in zip(enumerate(node.heuristic_solution.instance.items), node.heuristic_solution.selection):
-            if (x == 0 or x == None) and (item_e[1].value / item_e[1].weight) > max_val: 
-                max_val = item_e[1].value / item_e[1].weight
-                idx = item_e[0]
+            max_val = 0
+            idx = 0
+            enforced_weight = sum(item.weight for item, val in zip(node.heuristic_solution.instance.items, node.branching_decisions) if val == 1)
+            for item_e, x in zip(enumerate(node.heuristic_solution.instance.items), node.heuristic_solution.selection):
 
+                if (node.branching_decisions[item_e[0]] is None) and  (x == 0 or x == None) and (item_e[1].value / item_e[1].weight) > max_val and (item_e[1].weight + enforced_weight <= node.heuristic_solution.instance.capacity): 
+                    
+                    max_val = item_e[1].value / item_e[1].weight
+                    idx = item_e[0]
 
+            if (idx != 0):
+                return node.branching_decisions.split_on(idx)
 
         # next_branch = max(item.value / item.weight for item, x in zip(node.heuristic_solution.instance.items, node.heuristic_solution.selection) if x == None or x == 0)
 
-        return node.branching_decisions.split_on(idx)
         # placeholder: branch on the first unfixed variable
         first_unfixed = min(
             (i for i, val in enumerate(node.branching_decisions) if val is None),

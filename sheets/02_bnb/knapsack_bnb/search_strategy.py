@@ -92,8 +92,13 @@ def my_search_order(node: BnBNode) -> Any:
     """
     Example default: constant priority.
     """
+    """ dfs-type
     if node.depth == 0: return 0
-    x = sum(val * i for i, val in enumerate(node.branching_decisions) if val is not None)
-    return x
+    x = sum(val for i, val in enumerate(node.branching_decisions) if val is not None)
+    return len(node.branching_decisions) - x
+    """
+    res = 0
+    if node.relaxed_solution is not None:
+        res = -node.relaxed_solution.upper_bound        
 
-
+    return res
