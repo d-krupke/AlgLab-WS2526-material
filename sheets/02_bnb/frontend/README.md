@@ -1,8 +1,10 @@
 # Frontend for the B&B Visualization 𖣂
 
-> This code is not important, unless you want to change the visualization behavior
+> You will not modify this folder, unless you want to change the visualization behavior
 
-This folder provides the typescript and css files that can be transpiled into static js and css in `../knapsack_bnb/static`. These files are then used by the jinja templates in `../knapsack_bnb/templates`.
+This folder provides the typescript and css files that can be transpiled into
+static js and css in `../knapsack_bnb/static`. These files are then used by the
+jinja templates in `../knapsack_bnb/templates`.
 
 ## Develop locally ⚡
 

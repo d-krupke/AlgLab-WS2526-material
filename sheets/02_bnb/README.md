@@ -20,7 +20,9 @@ in better relaxations, branching rules, search orders, and heuristics.
 ## Prerequisites
 
 - A refresher on BnB (e.g.,
-  [Pascal van Hentenryck’s 15 min video on Coursera](https://www.coursera.org/lecture/discrete-optimization/knapsack-5-relaxation-branch-and-bound-66OlO?utm_source=link&utm_medium=page_share&utm_content=vlp&utm_campaign=top_button), EDIT: This course unfortunately has been removed, but you can find a copy on youtube, e.g., [here](https://www.youtube.com/watch?v=Kw5DNm39bmA)).
+  [Pascal van Hentenryck’s 15 min video on Coursera](https://www.coursera.org/lecture/discrete-optimization/knapsack-5-relaxation-branch-and-bound-66OlO?utm_source=link&utm_medium=page_share&utm_content=vlp&utm_campaign=top_button),
+  EDIT: This course unfortunately has been removed, but you can find a copy on
+  youtube, e.g., [here](https://www.youtube.com/watch?v=Kw5DNm39bmA)).
 - Optional: Algorithms & Data Structures 2, or any textbook covering BnB.
 
 ## Getting Started
@@ -61,8 +63,9 @@ bnb = BnBSearch(
 )
 ```
 
-Note that every run will create a new HTML file with the instance number, current date and time in the filename.
-You may want to delete the old files to avoid clutter:
+Note that every run will create a new HTML file with the instance number,
+current date and time in the filename. You may want to delete the old files to
+avoid clutter:
 
 ```sh
 chmod +x clean.sh   # Make clean-script executable

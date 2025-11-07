@@ -37,11 +37,7 @@ export interface BnBTree {
   /**
    * Status of the node in the visualization.
    */
-  status: "integral" | "infeasible" | "feasible";
-  /**
-   * Color of the node in the visualization.
-   */
-  color: string;
+  status: "feasible+integral" | "feasible" | "infeasible";
   /**
    * Children of the node.
    */
