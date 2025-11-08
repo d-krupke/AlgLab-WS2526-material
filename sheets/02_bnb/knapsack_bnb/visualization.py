@@ -15,7 +15,7 @@ from .heuristics import HeuristicSolution
 from .instance import Instance
 from .relaxation import RelaxedSolution
 
-RELAXED_STATUS = Literal["integral", "infeasible", "feasible"]
+RELAXED_STATUS = Literal["feasible+integral", "feasible", "infeasible"]
 
 
 class BnBTree(BaseModel):
@@ -42,7 +42,6 @@ class BnBTree(BaseModel):
     status: RELAXED_STATUS = Field(
         ..., description="Status of the node in the visualization."
     )
-    color: str = Field(..., description="Color of the node in the visualization.")
     children: list["BnBTree"] = Field(
         default_factory=list, description="Children of the node."
     )
@@ -53,7 +52,6 @@ class BnBVisualization:
         self.root: BnBTree | None = None
         self.node_links: dict[int, BnBTree] = {}
         self.instance: Instance = instance
-        self.node_detail_texts: dict[int, str] = {}
         self.iteration_info_detail_texts: dict[int, str] = {}
         self.iteration_solution_details: dict[int, str] = {}
         self.node_tooltips: dict[int, str] = {}
@@ -69,22 +67,23 @@ class BnBVisualization:
         return "#adb5bd" if not node.relaxed_solution.is_infeasible() else "#dc3545"
 
     def _get_node_status(self, node: BnBNode) -> RELAXED_STATUS:
-        if (
-            node.relaxed_solution.does_obey_capacity_constraint()
-            and node.relaxed_solution.is_integral()
-            and not node.relaxed_solution.is_infeasible()
+        relaxed_solution = node.relaxed_solution
+        if relaxed_solution.is_infeasible():
+            return "infeasible"
+        elif (
+            relaxed_solution.does_obey_capacity_constraint()
+            and relaxed_solution.is_integral()
         ):
-            return "integral"
-        return "feasible" if not node.relaxed_solution.is_infeasible() else "infeasible"
+            return "feasible+integral"
+        else:
+            return "feasible"
 
     def on_new_node_in_tree(self, node: BnBNode):
-        color = self._get_node_color(node)
         status = self._get_node_status(node)
         label = f"{node.relaxed_solution.upper_bound:.1f}"
         data = BnBTree(
             node_id=node.node_id,
             label=label,
-            color=color,
             status=status,
             children=[],
             created_at=len(self.iterations),
@@ -123,21 +122,6 @@ class BnBVisualization:
             assert parent_processed_at is not None
             assert node_processed_at is not None
             assert parent_processed_at < node_processed_at
-
-        with (
-            Path(__file__).parent / "./templates/node_details.j2.html"
-        ).open() as file:
-            # Render the node details
-            template_node_info = Template(file.read())
-            node_info = template_node_info.render(
-                node=node,
-                lb=lb,
-                ub=ub,
-                current_heuristic=node.heuristic_solution,
-                best_solution=best_solution,
-                weight=node.relaxed_solution.weight(),
-            )
-            self.node_detail_texts[node.node_id] = node_info
 
         with (
             Path(__file__).parent / "./templates/iteration_info.j2.html"
@@ -262,7 +246,6 @@ class BnBVisualization:
                         instance_info=instance_info,
                         instance=self.instance,
                         solution_details=solution_details,
-                        node_details=self.node_detail_texts,
                         node_tooltips=self.node_tooltips,
                     )
                 )

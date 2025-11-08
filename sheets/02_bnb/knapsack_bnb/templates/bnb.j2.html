@@ -1,11 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>({{instance.id}}) Branch & Bound Visualization</title>
     <!-- Core styling -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
-
     <link rel="stylesheet" href="./knapsack_bnb/static/bnb.css" />
   </head>
 
@@ -25,7 +23,7 @@
       <div class="split-container gap-1 my-3" data-panel-divider="#slider-solution-details-divider">
         <div class="panel-left px-0">
           <div class="split-container gap-0 mb-1">
-            <div class="panel-left px-0" style="flex-basis: 50%;">
+            <div class="panel-left px-0" style="flex-basis: 50%">
               <div class="card">
                 <h4 class="card-header">
                   Iteration Slider&nbsp;
@@ -70,35 +68,65 @@
               </div>
             </div>
 
-          <div class="panel-divider"></div>
+            <div class="panel-divider"></div>
 
-          <div class="panel-right px-0 d-flex">
-            <div class="card flex-fill">
-              <h4 class="card-header">
-                Iteration Solution Details&nbsp;
-                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
-                  <i
-                    class="bi bi-eye-fill eye-icon js-eye-icon"
-                    role="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#iteration-solution-details"
-                    aria-expanded="true"
-                    aria-controls="iteration-solutions-details"
-                  ></i>
-                </span>
-              </h4>
-              <div class="card-body p-0">
-                <div class="collapse show" id="iteration-solution-details">Here come iteration solution details</div>
+            <div class="panel-right px-0 d-flex">
+              <div class="card flex-fill">
+                <h4 class="card-header">
+                  Iteration Solution Details&nbsp;
+                  <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                    <i
+                      class="bi bi-eye-fill eye-icon js-eye-icon"
+                      role="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#iteration-solution-details"
+                      aria-expanded="true"
+                      aria-controls="iteration-solutions-details"
+                    ></i>
+                  </span>
+                </h4>
+                <div class="card-body p-0">
+                  <div class="collapse show" id="iteration-solution-details">Here come iteration solution details</div>
+                </div>
               </div>
             </div>
           </div>
-          </div>  
-            <div class="card">
-              <div class="graph-container">
-                <svg id="bnb-graph"></svg>
+          <div class="card">
+            <div class="graph-container">
+              <svg id="bnb-graph"></svg>
+              <div class="card graph-legend-container">
+                <h6 class="card-header py-1">
+                  Graph Legend
+                  <span data-bs-toggle="tooltip" data-bs-placement="top" title="Toggle visibility">
+                    <i
+                      class="bi bi-eye-fill eye-icon js-eye-icon"
+                      role="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#graph-legend"
+                      aria-expanded="true"
+                      aria-controls="graph-legend"
+                    ></i>
+                  </span>
+                </h6>
+                <div class="card-body p-0">
+                  <div class="collapse show px-2" id="graph-legend"></div>
+                </div>
+              </div>
+
+              <div class="btn-group zoom-buttons-container" role="group">
+                <button type="button" class="btn btn-outline-secondary py-1 px-2" id="zoomInButton">
+                  <i class="bi bi-zoom-in"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary py-1 px-2" id="zoomOutButton">
+                  <i class="bi bi-zoom-out"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary py-1 px-2" id="zoomResetButton">
+                  <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
               </div>
             </div>
           </div>
+        </div>
 
         <div class="panel-divider px-0" id="slider-solution-details-divider"></div>
 
@@ -169,12 +197,8 @@
           </div>
         </div>
       </div>
-
-      <!-- <div class="card my-3" id="node-details">Click on a node to see details here.</div> -->
     </div>
 
-    <script src="https://unpkg.com/tablesort@latest/dist/tablesort.min.js"></script>
-    <script src="https://unpkg.com/tablesort@latest/dist/sorts/tablesort.number.min.js"></script>
     <script id="bnb-data">
       const BNB_DATA = {
         "treeData": {{ tree_data | safe }},

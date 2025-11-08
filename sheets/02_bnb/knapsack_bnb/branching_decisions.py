@@ -8,15 +8,15 @@ class BranchingDecisions:
         length (int): Number of variables.
 
     Methods:
-        __getitem__(index) -> int 
+        __getitem__(index) -> int
             Get the decision at `index`.
-        fix(index, value) -> None 
+        fix(index, value) -> None
             Fix the decision at `index` to `value`
-        length() -> int 
+        length() -> int
             Get the length of the branching decisions. Equals the number of variables and is constant.
-        __iter__() -> Iterator[int | None]: 
+        __iter__() -> Iterator[int | None]:
             Iterate over the branching decisions.
-        split_on(index) -> (BranchingDecisions, BranchingDecisions) 
+        split_on(index) -> (BranchingDecisions, BranchingDecisions)
             Split the branching decisions into two based on the specified index.
     """
 
@@ -48,18 +48,18 @@ class BranchingDecisions:
         copy = BranchingDecisions(len(self))
         copy._assignments = self._assignments.copy()
         return copy
-    
+
     def included_items(self) -> list[int]:
         """
         Returns a list of fixed included items
         """
-        return [idx for idx,assigned in enumerate(self._assignments) if assigned == 1]
+        return [idx for idx, assigned in enumerate(self._assignments) if assigned == 1]
 
     def excluded_items(self) -> list[int]:
         """
         Returns a list of fixed excluded items
         """
-        return [idx for idx,assigned in enumerate(self._assignments) if assigned == 0]
+        return [idx for idx, assigned in enumerate(self._assignments) if assigned == 0]
 
     def __len__(self) -> int:
         return len(self._assignments)

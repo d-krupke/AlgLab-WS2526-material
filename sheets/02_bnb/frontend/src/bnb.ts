@@ -1,46 +1,20 @@
 import { Tooltip } from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import Tablesort from "tablesort";
+import "./tablesort/tablesort.number";
 import * as d3 from "d3";
 import "./style.css";
-import type { BnBTree } from "./types/apiTypes";
+import { BnBTree } from "./types/apiTypes";
 import { getElement } from "./utils";
+import { margin, radius, nodeColorsDict } from "./constants";
+import { TemplateMap, Dimensions, BnBNode, BnBLink } from "./types/customTypes";
 
-type BnBNode = d3.HierarchyNode<BnBTree>;
-type BnBLink = d3.HierarchyLink<BnBTree>;
-
-interface Dimensions {
-  /** The inner width of the SVG. */
-  width: number;
-  /** The inner height of the SVG. */
-  height: number;
-}
-interface TemplateMap {
-  /** Mapping from iteration index of a node to an HTML string for that iteration. */
-  [index: number]: string;
-}
-
-interface DomElements {
-  /** The slider input element. */
-  indexSlider: HTMLInputElement;
-  /** The span displaying the slider value. */
-  sliderValue: HTMLSpanElement;
-  /** Button to increment the slider. */
-  incrementButton: HTMLButtonElement;
-  /** Button to decrement the slider. */
-  decrementButton: HTMLButtonElement;
-  /** The container for displaying iteration info. */
-  iterationInfo: HTMLDivElement;
-  /** The container for displaying iteration solution details. */
-  iterationSolutionDetails: HTMLDivElement;
-}
+// Types -------------------------------------------------------------
+type DomElements = ReturnType<typeof getDomReferences>;
 
 // Global variables -------------------------------------------------------------
 
-const radius = 6; // circle r=6;
-/**
- * Margins around the SVG content
- */
-const margin = { top: 10, right: 90, bottom: 30, left: 90 };
 /**
  * Hierarchical data representing the BnB tree. See class `BnBTree` in `visualization.py`
  */
@@ -78,7 +52,7 @@ function initialRender(
   node_tooltips_param: TemplateMap,
   iteration_info_param: TemplateMap,
   iteration_solutions_param: TemplateMap,
-  iterations_param: number[],
+  iterations_param: number[]
 ): void {
   treeData = tree_data_param;
   iterationInfo = iteration_info_param;
@@ -87,45 +61,61 @@ function initialRender(
   iterations = iterations_param;
 
   const refs = getDomReferences();
-  const dimensions = computeDimensions();
+  const dimensions = computeDimensions(refs);
 
   const svg = createSvg(dimensions);
-  const g = svg.append("g").attr("transform", `translate(${margin.left}, 0)`);
+  const marginGroup = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
+  const contentGroup = marginGroup.append("g");
 
   const root = buildTreeLayout(dimensions);
-  renderNodesAndLinks(root, g, refs);
-  setupZoom(svg, g);
-
+  renderNodesAndLinks(root, contentGroup, refs);
+  setupZoom(refs, svg, contentGroup);
+  setupGraphLegend(refs);
   setupSliderBehavior(refs, svg);
-  setupSliderButtons(refs, svg);
-
-  updateSliderDisplay(refs, svg);
-
   setupEyeIconToggle();
   setupTooltips();
   setupTableSort();
   setupResizePanels();
+
+  updateSliderDisplay(refs, svg);
 }
 
 /**
  * Grabs and returns all necessary DOM references.
  */
-function getDomReferences(): DomElements {
-  return {
+function getDomReferences() {
+  const references = {
+    /** Graph container */
+    graphContainer: getElement<HTMLDivElement>(".graph-container"),
+    /** Graph legend container */
+    graphLegend: getElement<HTMLDivElement>("#graph-legend"),
+    /** The slider input element. */
     indexSlider: getElement<HTMLInputElement>("#indexSlider"),
+    /** The span displaying the slider value. */
     sliderValue: getElement<HTMLSpanElement>("#sliderValue"),
+    /** Button to increment the slider. */
     incrementButton: getElement<HTMLButtonElement>("#incrementButton"),
+    /** Button to decrement the slider. */
     decrementButton: getElement<HTMLButtonElement>("#decrementButton"),
+    /** Button to zoom in the graph. */
+    zoomInButton: getElement<HTMLButtonElement>("#zoomInButton"),
+    /** Button to zoom out the graph. */
+    zoomOutButton: getElement<HTMLButtonElement>("#zoomOutButton"),
+    /** Button to reset the zoom level. */
+    zoomResetButton: getElement<HTMLButtonElement>("#zoomResetButton"),
+    /** The container for displaying iteration info. */
     iterationInfo: getElement<HTMLDivElement>("#iteration-info"),
+    /** The container for displaying iteration solution details. */
     iterationSolutionDetails: getElement<HTMLDivElement>("#iteration-solution-details"),
-  };
+  } as const;
+  return references;
 }
 
 /**
  * Computes and returns layout dimensions for the SVG.
  */
-function computeDimensions(): Dimensions {
-  const container = getElement<HTMLDivElement>(".graph-container");
+function computeDimensions(refs: DomElements): Dimensions {
+  const container = refs.graphContainer;
   const width = container.getBoundingClientRect().width - margin.left - margin.right;
   const height = 0.8 * container.getBoundingClientRect().width - margin.bottom - margin.top;
   return { width, height };
@@ -168,7 +158,7 @@ function buildTreeLayout(dimensions: Dimensions) {
 function renderNodesAndLinks(
   root: BnBNode,
   g: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
-  refs: DomElements,
+  refs: DomElements
 ) {
   g.selectAll<SVGPathElement, BnBLink>(".link")
     .data(root.links())
@@ -180,7 +170,7 @@ function renderNodesAndLinks(
       d3
         .linkHorizontal<BnBLink, BnBNode>()
         .x((d) => d.y ?? 0)
-        .y((d) => d.x ?? 0),
+        .y((d) => d.x ?? 0)
     );
 
   const nodes = g
@@ -194,7 +184,7 @@ function renderNodesAndLinks(
   nodes
     .append("circle")
     .attr("r", radius)
-    .style("fill", (d) => d.data.color)
+    .style("fill", (d) => nodeColorsDict[d.data.status])
     .style("cursor", (d) => {
       const processed_at = d.data.processed_at;
       return processed_at !== null ? "pointer" : "default";
@@ -210,6 +200,7 @@ function renderNodesAndLinks(
     .attr("data-bs-toggle", "tooltip")
     .attr("data-bs-custom-class", "node-tooltip")
     .attr("data-bs-title", (d) => {
+      /* Tooltip HTML Template */
       return nodeTooltips[d.data.node_id];
     });
 
@@ -225,23 +216,63 @@ function renderNodesAndLinks(
  * Sets up zoom and pan behavior on the SVG.
  * @param {d3.Selection} svg - SVG element
  * @param {d3.Selection} g - Group container to transform
+ * @param {DomElements} refs - DOM references
  */
 function setupZoom(
+  refs: DomElements,
   svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>,
-  g: d3.Selection<SVGGElement, unknown, HTMLElement, any>,
+  g: d3.Selection<SVGGElement, unknown, HTMLElement, any>
 ) {
   const zoom = d3
     .zoom<SVGSVGElement, unknown>()
     .scaleExtent([0.5, 8])
-    .on("zoom", (event: any) => g.attr("transform", event.transform));
+    .on("zoom", (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => g.attr("transform", event.transform));
   svg.call(zoom).on("wheel", (event: WheelEvent) => event.preventDefault());
+
+  // Zoom in
+  refs.zoomInButton.addEventListener("click", () => {
+    svg.transition().call(zoom.scaleBy, 1.3);
+  });
+
+  // Zoom out
+  refs.zoomOutButton.addEventListener("click", () => {
+    svg.transition().call(zoom.scaleBy, 1 / 1.3);
+  });
+
+  // Reset zoom
+  refs.zoomResetButton.addEventListener("click", () => {
+    svg.transition().call(zoom.transform, d3.zoomIdentity);
+  });
+}
+
+/**
+ * Render the graph legend
+ */
+function setupGraphLegend(refs: DomElements) {
+  const legend = refs.graphLegend;
+
+  legend.innerHTML = `
+    <h6 class="card-title my-1">Relaxed solution:</h6>
+    <ul class="ps-0 mb-0" style="list-style: none;">
+      ${Object.entries(nodeColorsDict)
+        .map(
+          ([status, color]) => `
+        <li class="d-flex align-items-center my-1">
+          <span class="m-1 rounded-circle" style="background-color: ${color}; width: 0.7rem; height: 0.7rem;"></span>
+          <strong>${status}</strong>
+        </li>
+      `
+        )
+        .join("")}
+    </ul>
+  `;
 }
 
 /**
  * Makes the node details table sortable using Tablesort.
  */
 function setupTableSort() {
-  new Tablesort(document.getElementById("instance-table"));
+  new Tablesort(getElement<HTMLTableElement>("#instance-table"));
 }
 
 /**
@@ -249,7 +280,10 @@ function setupTableSort() {
  * @param {HTMLInputElement} indexSlider - Slider input
  * @param {d3.Selection} svg - SVG selection to update
  */
-function updateOpacity(indexSlider: HTMLInputElement, svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>) {
+function updateGraphElementsOpacity(
+  indexSlider: HTMLInputElement,
+  svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>
+) {
   function getOpacity(d: BnBNode) {
     if (d.data.created_at > Number(indexSlider.value)) return 0.1;
     if (
@@ -277,10 +311,8 @@ function updateOpacity(indexSlider: HTMLInputElement, svg: d3.Selection<SVGSVGEl
 function updateNodes(indexSlider: HTMLInputElement, svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>) {
   svg
     .selectAll<SVGCircleElement, BnBNode>(".node circle")
-    .attr("r", (d) => (d.data.processed_at === Number(indexSlider.value) ? radius * 1.8 : radius))
+    .attr("r", (d) => (d.data.processed_at === Number(indexSlider.value) ? radius * 1.3 : radius))
     .classed("current-node", (d) => d.data.processed_at === Number(indexSlider.value));
-
-  updateOpacity(indexSlider, svg);
 }
 
 /**
@@ -295,12 +327,13 @@ function updateSliderDisplay(refs: DomElements, svg: d3.Selection<SVGSVGElement,
 
   const iteration_info = iterationInfo[i] || "No iteration info available.";
   refs.iterationInfo.innerHTML = iteration_info;
-  new Tablesort(document.getElementById("iteration-table"));
+  new Tablesort(getElement<HTMLTableElement>("#iteration-table"));
 
   const iteration_solutions = iterationSolutionDetails[i] || "No iteration solution details available.";
   refs.iterationSolutionDetails.innerHTML = iteration_solutions;
 
   updateNodes(refs.indexSlider, svg);
+  updateGraphElementsOpacity(refs.indexSlider, svg);
 }
 
 /**
@@ -312,14 +345,8 @@ function setupSliderBehavior(refs: DomElements, svg: d3.Selection<SVGSVGElement,
   refs.indexSlider.addEventListener("input", () => {
     updateSliderDisplay(refs, svg);
   });
-}
 
-/**
- * Configures increment and decrement buttons for the slider.
- * @param {DomElements} refs
- * @param {d3.Selection} svg
- */
-function setupSliderButtons(refs: DomElements, svg: d3.Selection<SVGSVGElement, unknown, HTMLElement, any>) {
+  // Increment iteration Button
   refs.incrementButton.addEventListener("click", () => {
     if (Number(refs.indexSlider.value) < Number(refs.indexSlider.max)) {
       refs.indexSlider.value = String(Number(refs.indexSlider.value) + 1);
@@ -327,6 +354,7 @@ function setupSliderButtons(refs: DomElements, svg: d3.Selection<SVGSVGElement, 
     }
   });
 
+  // Decrement iteration Button
   refs.decrementButton.addEventListener("click", () => {
     if (Number(refs.indexSlider.value) > Number(refs.indexSlider.min)) {
       refs.indexSlider.value = String(Number(refs.indexSlider.value) - 1);
@@ -363,7 +391,7 @@ function setupEyeIconToggle() {
  */
 function setupTooltips() {
   // Override the private bootstrap tooltip _leave method, so when hovering over the actual tooltip it stil shows
-  //! This is just a monkey-patch, might change behavior in future bootstrap versions
+  //! This is just a monkey-patch messing with the internal bootstrap code, might change behavior in future bootstrap versions
   const originalLeave = Tooltip.prototype._leave;
   Tooltip.prototype._leave = function () {
     // Call the original to start the hide timeout
@@ -385,20 +413,20 @@ function setupTooltips() {
             () => {
               this.hide();
             },
-            { once: true },
+            { once: true }
           );
         },
-        { once: true },
+        { once: true }
       );
     }
   };
 
   // Enable Bootstrap tooltips
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  const tooltipTriggerList: HTMLElement[] = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
   tooltipTriggerList.map((el) => {
     const tooltip = new Tooltip(el, {
       html: true, // Enable HTML Tags in the tooltips
-      delay: { show: 50, hide: 200 },
+      delay: { show: 50, hide: 150 },
     });
 
     return tooltip;
@@ -432,8 +460,8 @@ function setupResizePanels() {
 
         // Calculate relative position to the left container-edge
         const rect = container.getBoundingClientRect();
-        // If mouse is on the right outside the split container, dont resize. Otherwise the container grows infinitely
-        if (rect.right <= event.clientX) return;
+        // If mouse is on the (right outside - 100px) of the split container, dont resize. Otherwise the container grows infinitely
+        if (rect.right <= event.clientX + 100) return;
 
         left.style.flexBasis = event.clientX - rect.left + "px";
       }
@@ -461,6 +489,6 @@ document.addEventListener("DOMContentLoaded", () => {
     data.node_tooltips,
     data.iteration_info,
     data.iteration_solution_details,
-    data.iterations,
+    data.iterations
   );
 });

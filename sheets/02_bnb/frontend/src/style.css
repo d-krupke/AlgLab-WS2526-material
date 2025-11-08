@@ -54,6 +54,18 @@ body {
   margin-top: 10px;
 }
 
+.graph-legend-container {
+  position: absolute;
+  top: 0.3rem;
+  left: 0.3rem;
+}
+
+.zoom-buttons-container {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+}
+
 .node-tooltip {
   --bs-tooltip-font-size: 1rem;
   --bs-tooltip-max-width: 370px;
@@ -89,7 +101,7 @@ body {
 
 .panel-right {
   flex: 1 1 auto;
-  min-width: 0;
+  min-width: 100px;
 }
 
 .panel-divider {
