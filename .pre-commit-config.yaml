@@ -4,7 +4,7 @@ ci:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: check-case-conflict
@@ -21,22 +21,23 @@ repos:
       - id: trailing-whitespace
         exclude: "^tests"
 
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: "v3.0.0-alpha.9-for-vscode"
-    hooks:
-      - id: prettier
-        types_or: [yaml, markdown, html, css, scss, javascript, json]
-        args: [--prose-wrap=always]
-        exclude: "^tests"
+  # - repo: https://github.com/pre-commit/mirrors-prettier
+  #   rev: "v3.0.0-alpha.9-for-vscode"
+  #   hooks:
+  #     - id: prettier
+  #       types_or: [yaml, markdown, html, css, scss, javascript, json]
+  #       args: [--prose-wrap=always]
+  #       exclude: "^tests"
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.1
+    # Ruff version.
+    rev: v0.14.3
     hooks:
-      - id: ruff
-        types_or: [python, pyi, jupyter]
-        args: [--fix, --ignore, T201, --ignore, E402]
+      # Run the linter.
+      - id: ruff-check
+        args: [ --fix ]
+      # Run the formatter.
       - id: ruff-format
-        types_or: [python, pyi, jupyter]
 
   - repo: local
     hooks:

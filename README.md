@@ -67,7 +67,6 @@ familiarity with the topics covered.
 > reach out to us. We are happy to help you and can adjust the schedule if
 > necessary.
 
-
 |                      Sheet                      |          Time           |                                                                                                                                                       Content                                                                                                                                                       |     |
 | :---------------------------------------------: | :---------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | --- |
 |     [Exercise Sheet 1A](./sheets/01_cpsat/)     | 2025-10-22 - 2025-11-05 |                                                                                              Constraint Programming with CP-SAT - A Hello-World with CP-SAT, NetworkX, and Scalene. All nice and easy to get started.                                                                                               |     |
@@ -77,7 +76,6 @@ familiarity with the topics covered.
 |      [Exercise Sheet 4](./sheets/04_mip/)       | 2025-11-19 - 2025-12-03 |       Mixed Integer Programming - Learn about Mixed Integer Programming (MIP), a technique favored by many optimization experts. Although not as expressive as CP-SAT, MIP offers better scalability and the opportunity to apply various optimization tricks thanks to an extensive mathematical foundation.       |     |
 | [Exercise Sheet 5](./sheets/05_graph_coloring/) | 2025-11-26 - 2025-12-10 | Benchmarking the Performance of Different Solvers and Formulations for the Graph Coloring Problem - This exercise focuses on comparing various formulations and solvers for the graph coloring problem, a common subproblem in many applications. It will help you understand how to benchmark solvers effectively. |     |
 
-
 > [!WARNING]
 >
 > These exercises are not traditional homework; they are the core of this course
@@ -86,7 +84,11 @@ familiarity with the topics covered.
 > have encountered before. You will need to carefully study both the course
 > material and the provided references to fully understand these concepts. Given
 > the complexity, I expect you to ask more questions and seek assistance
-> frequently.
+> frequently. Please do take the time to really engage with the material and do
+> not just iterate with ChatGPT until the tests pass. First, we will notice in
+> the code interviews if you really understood what you just did and second, you
+> will not learn anything this way. Use ChatGPT as a personalized tutor to
+> deepen your understanding but do not let it do the work for you.
 
 ## Prerequisites
 
@@ -139,32 +141,33 @@ is more!
 
 ## References
 
-- [In Pursuit of the Traveling Salesman](https://press.princeton.edu/books/paperback/9780691163529/in-pursuit-of-the-traveling-salesman):  
+- [In Pursuit of the Traveling Salesman](https://press.princeton.edu/books/paperback/9780691163529/in-pursuit-of-the-traveling-salesman):
   This excellent book is not only a surprisingly enjoyable read but also a
   remarkable introduction to the field of optimization. It presents many of the
   ideas that enable us to solve NP-hard problems in practice, while gently
   introducing the reader to the mindset of an optimization expert.
-- [Hands-On Mathematical Optimization with Python](https://www.cambridge.org/us/universitypress/subjects/mathematics/optimization-or-and-risk-analysis/hands-mathematical-optimization-python?format=AR#):  
-  A great introduction to mathematical optimization. Its focus differs from
-  that of this class, but it serves as a valuable complementary resource for
+- [Hands-On Mathematical Optimization with Python](https://www.cambridge.org/us/universitypress/subjects/mathematics/optimization-or-and-risk-analysis/hands-mathematical-optimization-python?format=AR#):
+  A great introduction to mathematical optimization. Its focus differs from that
+  of this class, but it serves as a valuable complementary resource for
   deepening your understanding of the topic.
-- [Primal Heuristics in Integer Programming](https://www.cambridge.org/core/books/primal-heuristics-in-integer-programming/FF179F5A69E7794BF0B737BEE0F92159):  
+- [Primal Heuristics in Integer Programming](https://www.cambridge.org/core/books/primal-heuristics-in-integer-programming/FF179F5A69E7794BF0B737BEE0F92159):
   This book provides an excellent overview of the generic techniques used to
   find good primal solutions in mixed-integer programming (and also in
-  constraint programming). Since we are mainly interested in primal solutions
-  in this class—and do not focus much on duality—this book is a natural next
-  step. It should not be your first book, but you can start exploring it fairly
-  early to gain a deeper understanding of the tricks solvers use to identify
-  good solutions.
-- [The Series by Adam DeJans Jr.](https://www.bitbrosdata.com/resources/optimization-books):  
-  A very concise set of books that can be read over a weekend. They stick to
-  the essentials without spending many words on unnecessary details. While
-  these books are not sufficient on their own to master optimization, their
-  clarity and brevity make them highly enjoyable. If I were starting again from
-  scratch, I would read these books in parallel with  
-  [Hands-On Mathematical Optimization with Python](https://www.cambridge.org/us/universitypress/subjects/mathematics/optimization-or-and-risk-analysis/hands-mathematical-optimization-python?format=AR#)  
-  (and, of course, the [CP-SAT Primer](https://d-krupke.github.io/cpsat-primer/)!).
-- [Integrated Methods for Optimization](https://link.springer.com/book/10.1007/978-1-4614-1900-6):  
+  constraint programming). Since we are mainly interested in primal solutions in
+  this class—and do not focus much on duality—this book is a natural next step.
+  It should not be your first book, but you can start exploring it fairly early
+  to gain a deeper understanding of the tricks solvers use to identify good
+  solutions.
+- [The Series by Adam DeJans Jr.](https://www.bitbrosdata.com/resources/optimization-books):
+  A very concise set of books that can be read over a weekend. They stick to the
+  essentials without spending many words on unnecessary details. While these
+  books are not sufficient on their own to master optimization, their clarity
+  and brevity make them highly enjoyable. If I were starting again from scratch,
+  I would read these books in parallel with
+  [Hands-On Mathematical Optimization with Python](https://www.cambridge.org/us/universitypress/subjects/mathematics/optimization-or-and-risk-analysis/hands-mathematical-optimization-python?format=AR#)
+  (and, of course, the
+  [CP-SAT Primer](https://d-krupke.github.io/cpsat-primer/)!).
+- [Integrated Methods for Optimization](https://link.springer.com/book/10.1007/978-1-4614-1900-6):
   I really appreciate this book, though it can be somewhat intimidating for
   beginners due to its breadth and depth. Read it once you have realized that
   many of the seemingly complicated concepts are, in fact, quite natural.
