@@ -37,18 +37,6 @@ class GurobiTspRelaxationSolver:
         self._model = gp.Model()
         # TODO: Implement me!
 
-    def add_lower_bound(self, lb: float) -> None:
-        """
-        Add a lower bound to the model. This is useful for branch-and-bound algorithms.
-        """
-
-        # Objective
-        def dist(u, v):
-            return self.graph.edges[u, v]["weight"]
-
-        tour_cost = gp.quicksum(dist(v, w) * x for (v, w), x in self._vars)
-        self._model.addConstr(tour_cost >= lb)
-
     def get_lower_bound(self) -> float:
         """
         Return the current lower bound.

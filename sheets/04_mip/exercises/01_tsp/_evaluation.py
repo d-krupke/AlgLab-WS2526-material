@@ -119,7 +119,7 @@ samples = []
 n = 200
 
 
-def get_sample(n=200):
+def get_sample():
     instance, points = generate_instance(n)
 
     # Create a figure with 2 rows and 3 columns
@@ -139,7 +139,7 @@ def get_sample(n=200):
         axes[0, 0],
         relaxed_solution_k2,
         points,
-        f"Linear Relaxation (obj: {linear_relaxation_value_k2:.2f})",
+        f"Linear Relaxation k=2 (obj: {linear_relaxation_value_k2:.2f})",
     )
 
     # Solving the integral problem
@@ -155,23 +155,20 @@ def get_sample(n=200):
 
     # Difference between integral solution and k=2 relaxation
     overlap_k2 = draw_overlap(axes[0, 2], solution, relaxed_solution_k2, points)
-    axes[0, 2].set_title(f"Overlap with relaxation ({overlap_k2}/{n})")
-
-    # Draw with given lower bound
+    axes[0, 2].set_title(f"Overlap with k=2 relaxation ({overlap_k2}/{n})")
 
     # Solving the linear relaxation with k=1
     print("Solving the linear relaxation with k=1")
-    relaxation_solver_lb = GurobiTspRelaxationSolver(instance, k=2)
-    relaxation_solver_lb.add_lower_bound(objective_value)
-    relaxation_solver_lb.solve()
-    relaxed_solution_lb = relaxation_solver_lb.get_solution()
-    linear_relaxation_value_lb = relaxation_solver_lb.get_objective()
-    assert relaxed_solution_lb is not None
+    relaxation_solver_k1 = GurobiTspRelaxationSolver(instance, k=1)
+    relaxation_solver_k1.solve()
+    relaxed_solution_k1 = relaxation_solver_k1.get_solution()
+    linear_relaxation_value_k1 = relaxation_solver_k1.get_objective()
+    assert relaxed_solution_k1 is not None
     draw_fractional_solution(
         axes[1, 0],
-        relaxed_solution_lb,
+        relaxed_solution_k1,
         points,
-        f"Linear Relaxation with lower bound constraint (obj: {linear_relaxation_value_lb:.2f})",
+        f"Linear Relaxation k=1 (obj: {linear_relaxation_value_k1:.2f})",
     )
 
     # Re-use integral solution for second row
@@ -180,8 +177,8 @@ def get_sample(n=200):
     )
 
     # Difference between integral solution and k=1 relaxation
-    overlap_lb = draw_overlap(axes[1, 2], solution, relaxed_solution_lb, points)
-    axes[1, 2].set_title(f"Overlap with constrained relaxation ({overlap_lb}/{n})")
+    overlap_k1 = draw_overlap(axes[1, 2], solution, relaxed_solution_k1, points)
+    axes[1, 2].set_title(f"Overlap with k=1 relaxation ({overlap_k1}/{n})")
 
     # Adjust layout and show plot
     plt.tight_layout()
@@ -190,5 +187,7 @@ def get_sample(n=200):
     print(
         f"Objective value: {objective_value}, Linear relaxation k=2 value: {linear_relaxation_value_k2}, Overlap: {overlap_k2}/{n}"
     )
-
+    print(
+        f"Objective value: {objective_value}, Linear relaxation k=1 value: {linear_relaxation_value_k1}, Overlap: {overlap_k1}/{n}"
+    )
     samples.append((objective_value, linear_relaxation_value_k2, overlap_k2))
