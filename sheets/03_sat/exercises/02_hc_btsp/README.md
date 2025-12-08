@@ -51,12 +51,12 @@ tour length introduces a much larger range of potential values.
 >
 > - $\sum_{w \in N(v)} x_{vw} = 2 \quad \forall v \in V$
 >
-> 2. **Subtour Elimination Constraints**: For each subset $S \subseteq V$ with
+> 2. **Subtour Elimination Constraints**: For each real subset $S \subsetneq V$ with
 >    $|S| \geq 2$, ensure there are at least two edges exiting the subset. This
 >    will ensure that the selected edges are connected, and in combination with
 >    the degree constraints, form a Hamiltonian cycle.
 >
-> - $\sum_{(v, w) \in E, v \in S, w \notin S} x_{vw} \geq 2 \quad \forall S \subseteq V, |S| \geq 2$
+> - $\sum_{(v, w) \in E, v \in S, w \notin S} x_{vw} \geq 2 \quad \forall S \subsetneq V, |S| \geq 2$
 
 ## Deliverables
 
